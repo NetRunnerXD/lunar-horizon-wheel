@@ -1,8 +1,5 @@
 {
- "generated": "2026-10-13T09:39:08Z",
- "start": "2026-01-01T00:00:00Z",
- "end": "2029-01-01T00:00:00Z",
- "step_hours": 1,
+ "generated": "2026-10-13T12:40:53Z",
  "sites": [
   {
    "id": "shackleton",
@@ -12,7 +9,7 @@
    "kind": "gazetteer",
    "note": "USGS Gazetteer centre coordinate of Shackleton (diameter 20.92 km).",
    "elevation_m": -2789.0,
-   "dem": "LDEM_85S_40M + LDEM_75S_240M"
+   "dem": "LDEM_80S_40M + LDEM_60S_240M"
   },
   {
    "id": "de-gerlache",
@@ -22,7 +19,7 @@
    "kind": "gazetteer",
    "note": "USGS Gazetteer centre coordinate of de Gerlache (diameter 32.71 km).",
    "elevation_m": -1217.0,
-   "dem": "LDEM_85S_40M + LDEM_75S_240M"
+   "dem": "LDEM_80S_40M + LDEM_60S_240M"
   },
   {
    "id": "haworth",
@@ -32,7 +29,7 @@
    "kind": "gazetteer",
    "note": "USGS Gazetteer centre coordinate of Haworth (diameter 51.42 km).",
    "elevation_m": -3314.0,
-   "dem": "LDEM_85S_40M + LDEM_75S_240M"
+   "dem": "LDEM_80S_40M + LDEM_60S_240M"
   },
   {
    "id": "faustini",
@@ -42,7 +39,7 @@
    "kind": "gazetteer",
    "note": "USGS Gazetteer centre coordinate of Faustini (diameter 42.48 km).",
    "elevation_m": -2751.5,
-   "dem": "LDEM_85S_40M + LDEM_75S_240M"
+   "dem": "LDEM_80S_40M + LDEM_60S_240M"
   },
   {
    "id": "nobile",
@@ -52,7 +49,7 @@
    "kind": "gazetteer",
    "note": "USGS Gazetteer centre coordinate of Nobile (diameter 79.27 km).",
    "elevation_m": 923.0,
-   "dem": "LDEM_85S_40M + LDEM_75S_240M"
+   "dem": "LDEM_80S_40M + LDEM_60S_240M"
   },
   {
    "id": "mons-malapert",
@@ -62,7 +59,7 @@
    "kind": "gazetteer",
    "note": "USGS Gazetteer centre coordinate of Mons Malapert (diameter 67.0 km).",
    "elevation_m": 4920.0,
-   "dem": "LDEM_85S_40M + LDEM_75S_240M"
+   "dem": "LDEM_80S_40M + LDEM_60S_240M"
   },
   {
    "id": "mons-mouton",
@@ -71,8 +68,8 @@
    "lon": 31.0,
    "kind": "gazetteer",
    "note": "USGS Gazetteer centre coordinate of Mons Mouton (diameter 130.0 km).",
-   "elevation_m": 4999.0,
-   "dem": "LDEM_75S_240M"
+   "elevation_m": 5027.5,
+   "dem": "LDEM_80S_40M + LDEM_60S_240M"
   },
   {
    "id": "shoemaker",
@@ -82,7 +79,7 @@
    "kind": "gazetteer",
    "note": "USGS Gazetteer centre coordinate of Shoemaker (diameter 51.82 km).",
    "elevation_m": -3933.5,
-   "dem": "LDEM_85S_40M + LDEM_75S_240M"
+   "dem": "LDEM_80S_40M + LDEM_60S_240M"
   },
   {
    "id": "shackleton-rim-high",
@@ -92,7 +89,7 @@
    "kind": "derived",
    "note": "Highest LOLA DEM pixel 8.4-14.6 km from the gazetteer centre of Shackleton; an illustrative candidate, not an official landing site.",
    "elevation_m": 1737.0,
-   "dem": "LDEM_85S_40M + LDEM_75S_240M"
+   "dem": "LDEM_80S_40M + LDEM_60S_240M"
   },
   {
    "id": "de-gerlache-rim-high",
@@ -102,7 +99,7 @@
    "kind": "derived",
    "note": "Highest LOLA DEM pixel 13.1-22.9 km from the gazetteer centre of de Gerlache; an illustrative candidate, not an official landing site.",
    "elevation_m": 1815.0,
-   "dem": "LDEM_85S_40M + LDEM_75S_240M"
+   "dem": "LDEM_80S_40M + LDEM_60S_240M"
   },
   {
    "id": "malapert-summit",
@@ -112,17 +109,27 @@
    "kind": "derived",
    "note": "Highest LOLA DEM pixel 0.0-16.8 km from the gazetteer centre of Mons Malapert; an illustrative candidate, not an official landing site.",
    "elevation_m": 5173.5,
-   "dem": "LDEM_85S_40M + LDEM_75S_240M"
+   "dem": "LDEM_80S_40M + LDEM_60S_240M"
   },
   {
    "id": "mouton-summit",
    "name": "Mons Mouton summit (DEM max)",
-   "lat": -84.8215,
-   "lon": 37.4912,
+   "lat": -84.821,
+   "lon": 37.5335,
    "kind": "derived",
    "note": "Highest LOLA DEM pixel 0.0-19.5 km from the gazetteer centre of Mons Mouton; an illustrative candidate, not an official landing site.",
-   "elevation_m": 6674.0,
-   "dem": "LDEM_75S_240M"
+   "elevation_m": 6721.5,
+   "dem": "LDEM_80S_40M + LDEM_60S_240M"
+  },
+  {
+   "id": "shiv-shakti",
+   "name": "Shiv Shakti point (Chandrayaan-3)",
+   "lat": -69.3733,
+   "lon": 32.3186,
+   "kind": "isro",
+   "note": "Chandrayaan-3 Vikram landing point (ISRO). Outside the 40 m DEM: horizon from LOLA LDEM_60S_240M only.",
+   "elevation_m": 520.5,
+   "dem": "LDEM_60S_240M"
   }
  ]
 }

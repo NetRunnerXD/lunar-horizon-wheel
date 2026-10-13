@@ -1,142 +1,219 @@
-import { useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { HorizonWheel } from './HorizonWheel'
 import { Timeline } from './Timeline'
 import { Methods } from './Methods'
-import { metrics, series, type SiteData, type SiteMeta } from './metrics'
-import { exportHourlyCsv, exportJson, exportSummaryCsv } from './exportData'
+import { MapView } from './MapView'
+import { RankView, PowerComms, Missions, fmtH } from './Panels'
+import { gridSite, interpVec, metrics, series, uncertainty, xyFromLatLon, type Ephem, type Goal, type Grid, type SiteData, type SiteMeta } from './physics'
+import { loadCore, loadGrid, loadLayers, loadSite, type IsroLayer, type Products } from './data'
+import { exportJson, exportSeriesCsv, exportSummaryCsv } from './exportData'
+const Terrain3D = lazy(() => import('./Terrain3D').then(m => ({ default: m.Terrain3D })))
 
-const BASE = import.meta.env.BASE_URL
-const DATA_MIN = '2026-01-01', DATA_MAX = '2028-12-31'
+const DATA_MIN = '2026-01-02', DATA_MAX = '2028-12-30'
 const day = (s: string) => Date.parse(s + 'T00:00:00Z')
 const fmtUtc = (ms: number) => new Date(ms).toISOString().replace('T', ' ').slice(0, 16) + ' UTC'
-const fmtH = (h: number) => (h >= 48 ? `${(h / 24).toFixed(1)} d` : `${h} h`)
+const TABS = [['compare', 'Compare'], ['map', 'Map & custom site'], ['3d', '3D terrain'], ['rank', 'Rank'], ['power', 'Power & comms'], ['missions', 'CLPS missions'], ['methods', 'Methods & validation']] as const
+type Tab = typeof TABS[number][0]
 
 function readHash() {
   const p = new URLSearchParams(location.hash.slice(1))
-  return { sites: p.get('sites')?.split(',').filter(Boolean), from: p.get('from'), to: p.get('to'), view: p.get('view') }
+  return { sites: p.get('sites')?.split(',').filter(Boolean), from: p.get('from'), to: p.get('to'), view: p.get('view'), custom: p.get('custom') }
 }
 
 export default function App() {
-  const h0 = readHash()
+  const h0 = useRef(readHash()).current
   const [index, setIndex] = useState<SiteMeta[]>([])
+  const [products, setProducts] = useState<Products | null>(null)
+  const [ephem, setEphem] = useState<Ephem | null>(null)
+  const [grid, setGrid] = useState<Grid | null>(null)
+  const [layers, setLayers] = useState<IsroLayer[]>([])
   const [selected, setSelected] = useState<string[]>(h0.sites ?? ['shackleton-rim-high', 'de-gerlache-rim-high', 'malapert-summit'])
   const [from, setFrom] = useState(h0.from ?? '2026-11-14')
   const [to, setTo] = useState(h0.to ?? '2027-02-14')
-  const [view, setView] = useState(h0.view === 'methods' ? 'methods' : 'compare')
+  const [tab, setTab] = useState<Tab>((TABS.find(t => t[0] === h0.view)?.[0]) ?? 'compare')
   const [data, setData] = useState<Record<string, SiteData>>({})
   const [cursorFrac, setCursorFrac] = useState(0.5)
+  const [playing, setPlaying] = useState(false)
+  const [goal, setGoal] = useState<Goal>('balanced')
   const [err, setErr] = useState<string | null>(null)
+  const [busy, setBusy] = useState(false)
 
-  useEffect(() => { fetch(BASE + 'data/sites.json').then(r => r.json()).then(j => setIndex(j.sites)).catch(e => setErr(String(e))) }, [])
+  useEffect(() => { loadCore().then(c => { setIndex(c.index); setProducts(c.products); setEphem(c.ephem) }).catch(e => setErr(String(e))); loadLayers().then(setLayers) }, [])
+  const addCustom = (lat: number, lon: number, g: Grid) => {
+    const p = xyFromLatLon(lat, lon), r = gridSite(g, p.x, p.y)
+    if (!r) { setErr('Custom point is outside the precomputed horizon grid (±150 km of the pole).'); return }
+    const d: SiteData = { id: 'custom', name: `Custom ${lat.toFixed(3)}°, ${lon.toFixed(2)}°`, lat, lon, kind: 'custom', elevation_m: Math.round(r.elevation_m),
+      note: 'User-picked point. Horizon blended from the 5 km ray-marched grid (2° bins).', dem: 'grid: LDEM_80S_40M + LDEM_60S_240M (5 km, 2°)', horizon_step_deg: 2, mast_m: 2, horizon: r.horizon }
+    setData(o => ({ ...o, custom: d })); setSelected(s => [...s.filter(x => x !== 'custom').slice(0, 3), 'custom'])
+  }
+  const needGrid = tab === 'map' || !!h0.custom
+  useEffect(() => { if (needGrid && products && !grid) loadGrid(products).then(g => { setGrid(g); if (h0.custom) { const [a, b] = h0.custom.split(',').map(Number); if (isFinite(a) && isFinite(b)) addCustom(a, b, g) } }).catch(e => setErr(String(e))) }, [needGrid, products, grid]) // eslint-disable-line react-hooks/exhaustive-deps
+  const wantIds = tab === 'rank' ? [...new Set([...index.map(s => s.id), ...selected])] : selected
   useEffect(() => {
-    for (const id of selected) if (!data[id])
-      fetch(`${BASE}data/sites/${id}.json`).then(r => r.json()).then((d: SiteData) => setData(o => ({ ...o, [id]: d }))).catch(e => setErr(String(e)))
-  }, [selected, data])
-  useEffect(() => { history.replaceState(null, '', `#sites=${selected.join(',')}&from=${from}&to=${to}&view=${view}`) }, [selected, from, to, view])
+    for (const id of wantIds) if (!data[id] && id !== 'custom')
+      loadSite(id).then(d => setData(o => ({ ...o, [id]: d }))).catch(e => setErr(String(e)))
+  }, [wantIds.join(','), data]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    const c = data.custom && selected.includes('custom') ? `&custom=${data.custom.lat.toFixed(4)},${data.custom.lon.toFixed(3)}` : ''
+    history.replaceState(null, '', `#sites=${selected.join(',')}&from=${from}&to=${to}&view=${tab}${c}`)
+  }, [selected, from, to, tab, data.custom])
 
   let fromMs = day(from), toMs = day(to) + 86400e3
   if (!(toMs > fromMs)) toMs = fromMs + 86400e3
-  const items = useMemo(() => selected.filter(id => data[id]).map(id => {
-    const d = data[id], s = series(d, fromMs, toMs)
-    return { d, s, m: metrics(s, d.step_hours) }
-  }), [selected, data, fromMs, toMs])
+  const items = useMemo(() => !ephem ? [] : selected.filter(id => data[id]).map(id => {
+    const d = data[id], s = series(d, ephem, fromMs, toMs), m = metrics(s)
+    return { d, s, m, u: uncertainty(d, ephem, fromMs, toMs, m) }
+  }), [selected, data, fromMs, toMs, ephem])
+  const rankRows = useMemo(() => tab !== 'rank' || !ephem ? [] : wantIds.filter(id => data[id]).map(id => ({ d: data[id], m: metrics(series(data[id], ephem, fromMs, toMs, { stepMin: 30 })) })),
+    [tab, data, fromMs, toMs, ephem, wantIds.join(',')]) // eslint-disable-line react-hooks/exhaustive-deps
   const cursorMs = fromMs + cursorFrac * (toMs - fromMs)
+  const sunVec = useMemo(() => ephem ? interpVec(ephem, (cursorMs - ephem.start) / (ephem.stepS * 1e3), 0, [0, 0, 0]) : null, [ephem, cursorMs])
+
+  useEffect(() => {
+    if (!playing) return
+    let raf = 0, last = performance.now()
+    const tick = (t: number) => { const dt = t - last; last = t; setCursorFrac(f => (f + dt / 20000) % 1); raf = requestAnimationFrame(tick) }
+    raf = requestAnimationFrame(tick); return () => cancelAnimationFrame(raf)
+  }, [playing])
+  useEffect(() => { if (matchMedia('(prefers-reduced-motion: reduce)').matches) setPlaying(false) }, [])
 
   const toggle = (id: string) => setSelected(s => s.includes(id) ? (s.length > 1 ? s.filter(x => x !== id) : s) : s.length >= 4 ? s : [...s, id])
-  const best = (k: 'sunlitPct' | 'earthPct' | 'bothPct' | 'powerProxy', low = false) => {
+  const bestOf = (f: (m: typeof items[number]['m']) => number, low = false) => {
     if (items.length < 2) return null
-    const v = items.map(i => (k === 'powerProxy' ? i.m[k] : i.m[k]))
-    return items[v.indexOf(low ? Math.min(...v) : Math.max(...v))].d.id
+    const v = items.map(i => f(i.m)); return items[v.indexOf(low ? Math.min(...v) : Math.max(...v))].d.id
   }
-  const bestDark = items.length > 1 ? items.reduce((a, b) => (b.m.longestDarkH < a.m.longestDarkH ? b : a)).d.id : null
+  const tabKey = (e: React.KeyboardEvent, i: number) => {
+    const n = TABS.length, j = e.key === 'ArrowRight' ? (i + 1) % n : e.key === 'ArrowLeft' ? (i + n - 1) % n : e.key === 'Home' ? 0 : e.key === 'End' ? n - 1 : -1
+    if (j >= 0) { e.preventDefault(); setTab(TABS[j][0]); document.getElementById('tab-' + TABS[j][0])?.focus() }
+  }
+  const doPdf = async () => {
+    setBusy(true)
+    try {
+      const { pdfReport, svgToPng } = await import('./report')
+      const svgs = [...document.querySelectorAll<SVGSVGElement>('svg.wheel')]
+      const wheels = await Promise.all(svgs.map(s => svgToPng(s).catch(() => '')))
+      pdfReport(items, fromMs, toMs, wheels)
+    } catch (e) { setErr('PDF export failed: ' + e) } finally { setBusy(false) }
+  }
+  const range = (lo: number, hi: number, f = (x: number) => x.toFixed(1)) => <span className="rng" title="Uncertainty envelope: time step, Sun-disk model, DEM resolution">{f(lo)}–{f(hi)}</span>
 
   return (
     <div className="app">
+      <a href="#main" className="skip">Skip to content</a>
       <header>
-        <div className="brand"><span className="logo" aria-hidden>◐</span> <div><h1>Lunar Horizon Wheel</h1>
-          <p>Compare Moon south-pole landing sites: when the Sun clears the terrain (power) and when Earth is above it (direct-to-Earth comms).</p></div></div>
-        <nav>
-          <button className={view === 'compare' ? 'on' : ''} onClick={() => setView('compare')}>Compare</button>
-          <button className={view === 'methods' ? 'on' : ''} onClick={() => setView('methods')}>Methods &amp; data</button>
-        </nav>
+        <div className="brand"><svg className="logo" viewBox="0 0 40 40" aria-hidden><circle cx="20" cy="20" r="17" fill="#1b2235" stroke="#ffc23d" strokeWidth="2" /><path d="M3 24 L10 19 L15 22 L22 15 L28 20 L37 17 L37 24 A17 17 0 0 1 3 24Z" fill="#7a6248" /><circle cx="29" cy="11" r="3.5" fill="#ffc23d" /><circle cx="11" cy="12" r="2.5" fill="#4fa3ff" /></svg>
+          <div><h1>Lunar Horizon Wheel</h1>
+            <p>Research-grade comparison of Moon south-pole sites: when the Sun clears the terrain (power), when Earth and the Deep Space Network can be reached (comms) — validated against NASA Goddard maps.</p></div></div>
       </header>
-      {err && <div className="error">Data load error: {err}</div>}
-      {view === 'methods' ? <Methods index={index} /> : (
-        <main>
+      <nav role="tablist" aria-label="Views" className="tabs">
+        {TABS.map(([k, l], i) => <button key={k} id={'tab-' + k} role="tab" aria-selected={tab === k} aria-controls="main" tabIndex={tab === k ? 0 : -1} className={tab === k ? 'on' : ''} onClick={() => setTab(k)} onKeyDown={e => tabKey(e, i)}>{l}</button>)}
+      </nav>
+      {err && <div className="error" role="alert">{err} <button onClick={() => setErr(null)} aria-label="Dismiss error">×</button></div>}
+      <main id="main" role="tabpanel" aria-labelledby={'tab-' + tab}>
+        {tab !== 'methods' && tab !== 'missions' && (
           <section className="controls">
             <fieldset>
-              <legend>Sites (pick 2–4)</legend>
+              <legend>Sites (pick 1–4)</legend>
               <div className="site-list">
-                {index.map(s => (
+                {[...index, ...(data.custom ? [data.custom] : [])].map(s => (
                   <label key={s.id} className={selected.includes(s.id) ? 'chip on' : 'chip'} title={s.note}>
-                    <input type="checkbox" checked={selected.includes(s.id)} onChange={() => toggle(s.id)}
-                      disabled={!selected.includes(s.id) && selected.length >= 4} />
-                    {s.name} <small>{s.lat.toFixed(2)}°, {s.lon.toFixed(2)}°</small>
+                    <input type="checkbox" checked={selected.includes(s.id)} onChange={() => toggle(s.id)} disabled={!selected.includes(s.id) && selected.length >= 4} />
+                    {s.name} {s.kind === 'derived' && <em className="tag">illustrative</em>}{s.kind === 'isro' && <em className="tag isro">ISRO</em>}{s.kind === 'custom' && <em className="tag">custom</em>}
                   </label>))}
               </div>
             </fieldset>
             <fieldset className="dates">
-              <legend>Date range (UTC)</legend>
+              <legend>Date range (UTC, 2026–2028)</legend>
               <label>From <input type="date" value={from} min={DATA_MIN} max={DATA_MAX} onChange={e => e.target.value && setFrom(e.target.value)} /></label>
               <label>To <input type="date" value={to} min={DATA_MIN} max={DATA_MAX} onChange={e => e.target.value && setTo(e.target.value)} /></label>
               <div className="presets">
-                {[['14 d', 14], ['1 lunar day', 29.53], ['90 d', 90], ['1 yr', 365]].map(([l, n]) => (
-                  <button key={l as string} onClick={() => setTo(new Date(day(from) + (n as number) * 86400e3).toISOString().slice(0, 10))}>{l}</button>))}
+                {([['14 d', 14], ['1 lunar day', 29.53], ['90 d', 90], ['1 yr', 365]] as const).map(([l, n]) => (
+                  <button key={l} onClick={() => setTo(new Date(Math.min(day(DATA_MAX), day(from) + n * 86400e3)).toISOString().slice(0, 10))}>{l}</button>))}
               </div>
             </fieldset>
             <fieldset className="exports">
               <legend>Export</legend>
+              <button onClick={doPdf} disabled={busy || !items.length}>{busy ? 'Building…' : 'PDF report'}</button>
               <button onClick={() => exportSummaryCsv(items, fromMs, toMs)}>Summary CSV</button>
-              <button onClick={() => exportJson(items, fromMs, toMs)}>JSON + DTE windows</button>
-              <button onClick={() => exportHourlyCsv(items)}>Hourly CSV</button>
+              <button onClick={() => exportJson(items, fromMs, toMs)}>JSON + windows</button>
+              <button onClick={() => exportSeriesCsv(items)}>10-min CSV</button>
               <button onClick={() => navigator.clipboard?.writeText(location.href)}>Copy share link</button>
             </fieldset>
-          </section>
+          </section>)}
+        {(tab === 'compare' || tab === '3d') && (
+          <section className="scrub" aria-label="Time cursor">
+            <button className="play" onClick={() => setPlaying(p => !p)} aria-pressed={playing} aria-label={playing ? 'Pause animation' : 'Animate Sun and Earth tracks'}>{playing ? '❚❚' : '▶'}</button>
+            <input type="range" min={0} max={1000} value={Math.round(cursorFrac * 1000)} onChange={e => setCursorFrac(+e.target.value / 1000)} aria-label="Time cursor" aria-valuetext={fmtUtc(cursorMs)} />
+            <span className="now" aria-live="off">{fmtUtc(cursorMs)}</span>
+          </section>)}
+        {!ephem && !err && <p className="small">Loading ephemeris and site data…</p>}
 
-          <section className="scrub">
-            <label>Time <input type="range" min={0} max={1000} value={Math.round(cursorFrac * 1000)} onChange={e => setCursorFrac(+e.target.value / 1000)} aria-label="Time scrubber" /></label>
-            <span className="now">{fmtUtc(cursorMs)}</span>
-          </section>
-
-          <section className="cards" style={{ gridTemplateColumns: `repeat(${Math.max(1, items.length)}, minmax(240px, 1fr))` }}>
-            {items.map(({ d, s, m }) => {
-              const ci = s.t.length ? Math.min(s.t.length - 1, Math.max(0, Math.round((cursorMs - s.t[0]) / (d.step_hours * 3600e3)))) : null
+        {tab === 'compare' && <>
+          <section className="cards">
+            {items.map(({ d, s, m, u }) => {
+              const ci = s.t.length ? Math.min(s.t.length - 1, Math.max(0, Math.round((cursorMs - s.t[0]) / (s.stepH * 3600e3)))) : null
               return (
-                <article key={d.id} className="card">
+                <article key={d.id} className="card" aria-label={d.name}>
                   <h2>{d.name}</h2>
-                  <p className="meta">{d.lat.toFixed(3)}°, {d.lon.toFixed(3)}°E · {Math.round(d.elevation_m)} m · {d.kind === 'derived' ? 'derived candidate' : 'gazetteer feature'}</p>
-                  <HorizonWheel horizon={d.horizon} step={d.horizon_step_deg} s={s} cursor={ci} />
-                  {ci != null && <p className="instant">☀ {s.sunEl[ci].toFixed(2)}° vs terrain {s.sunHz[ci].toFixed(2)}° → <b>{s.sunFrac[ci] >= 0.5 ? 'lit' : 'shadow'}</b> ({Math.round(s.sunFrac[ci] * 100)}% disk) · 🌍 {s.earthEl[ci].toFixed(2)}° vs {s.earthHz[ci].toFixed(2)}° → <b>{s.earthVis[ci] ? 'in view' : 'blocked'}</b></p>}
+                  <p className="meta">{d.lat.toFixed(3)}°, {d.lon.toFixed(3)}°E · {Math.round(d.elevation_m)} m · {d.dem}{d.kind === 'derived' && ' · illustrative candidate'}</p>
+                  <HorizonWheel horizon={d.horizon} alt={u.demAvailable ? d.horizon_240m : undefined} step={d.horizon_step_deg} s={s} cursor={ci} label={`Horizon wheel for ${d.name}`} />
+                  {ci != null && <p className="instant" aria-live="polite">☀ {s.sunEl[ci].toFixed(2)}° vs terrain {s.sunHz[ci].toFixed(2)}° → <b>{Math.round(s.sunFrac[ci] * 100)}% of disk</b> · 🌍 {s.earthEl[ci].toFixed(2)}° vs {s.earthHz[ci].toFixed(2)}° → <b>{s.earthVis[ci] ? 'in view' : 'blocked'}</b>{s.dsnVis[ci] && ' · DSN ✓'}</p>}
                   <dl className="metrics">
-                    <div className={best('sunlitPct') === d.id ? 'best' : ''}><dt>Sunlit</dt><dd>{m.sunlitPct.toFixed(1)}%</dd></div>
-                    <div className={bestDark === d.id ? 'best' : ''}><dt>Longest dark</dt><dd>{fmtH(m.longestDarkH)}</dd></div>
-                    <div className={best('earthPct') === d.id ? 'best' : ''}><dt>Earth in view</dt><dd>{m.earthPct.toFixed(1)}%</dd></div>
-                    <div className={best('bothPct') === d.id ? 'best' : ''}><dt>Sun + Earth</dt><dd>{m.bothPct.toFixed(1)}%</dd></div>
-                    <div className={best('powerProxy') === d.id ? 'best' : ''}><dt>Power proxy</dt><dd>{(m.powerProxy * 100).toFixed(1)}%</dd></div>
-                    <div><dt>DTE windows</dt><dd>{m.dteWindows.length}</dd></div>
+                    <div className={bestOf(x => x.sunlitPct) === d.id ? 'best' : ''}><dt>Sunlit</dt><dd>{m.sunlitPct.toFixed(1)}%</dd>{range(u.sunlit.lo, u.sunlit.hi)}</div>
+                    <div className={bestOf(x => x.longestDarkH, true) === d.id ? 'best' : ''}><dt>Longest dark</dt><dd>{fmtH(m.longestDarkH)}</dd>{range(u.dark.lo, u.dark.hi, x => fmtH(Math.max(0, x)))}</div>
+                    <div className={bestOf(x => x.earthPct) === d.id ? 'best' : ''}><dt>Earth in view</dt><dd>{m.earthPct.toFixed(1)}%</dd>{range(u.earth.lo, u.earth.hi)}</div>
+                    <div className={bestOf(x => x.dsnPct) === d.id ? 'best' : ''}><dt>DSN contact</dt><dd>{m.dsnPct.toFixed(1)}%</dd></div>
+                    <div className={bestOf(x => x.bothPct) === d.id ? 'best' : ''}><dt>Sun + Earth</dt><dd>{m.bothPct.toFixed(1)}%</dd></div>
+                    <div className={bestOf(x => x.powerProxy) === d.id ? 'best' : ''}><dt>Power index <abbr title="Mean visible-disk fraction × cos(elevation) × (1 AU / distance)²; 100% = full Sun at 1 AU on a vertical tracking panel">ⓘ</abbr></dt><dd>{(m.powerProxy * 100).toFixed(1)}%</dd></div>
                   </dl>
+                  {!u.demAvailable && <p className="small warn">DEM-resolution uncertainty unavailable (no 40 m DEM here); ranges cover time step and disk model only.</p>}
                   <details>
-                    <summary>DTE contact windows ({m.dteWindows.length})</summary>
-                    <table><thead><tr><th>Start (UTC)</th><th>End (UTC)</th><th>Length</th></tr></thead><tbody>
-                      {m.dteWindows.slice(0, 60).map(w => <tr key={w.start}><td>{fmtUtc(w.start).slice(0, 16)}</td><td>{fmtUtc(w.end).slice(0, 16)}</td><td>{fmtH(w.hours)}</td></tr>)}
+                    <summary>DSN contact windows ({m.dsnWindows.length}) · DTE windows ({m.dteWindows.length})</summary>
+                    <table><thead><tr><th>DSN start (UTC)</th><th>End</th><th>Length</th></tr></thead><tbody>
+                      {m.dsnWindows.slice(0, 40).map(w => <tr key={w.start}><td>{fmtUtc(w.start).slice(0, 16)}</td><td>{fmtUtc(w.end).slice(0, 16)}</td><td>{fmtH(w.hours)}</td></tr>)}
                     </tbody></table>
-                    {m.dteWindows.length > 60 && <p className="small">First 60 shown; export JSON for all.</p>}
+                    {m.dsnWindows.length > 40 && <p className="small">First 40 shown; export JSON for all.</p>}
                   </details>
                 </article>)
             })}
           </section>
-          <section className="legend">
+          <section className="legend" aria-label="Legend">
             <span><i className="sw sun" /> Sun above terrain</span><span><i className="sw sun-d" /> Sun hidden</span>
             <span><i className="sw earth" /> Earth in view</span><span><i className="sw earth-d" /> Earth hidden</span>
-            <span><i className="sw terrain" /> LOLA terrain horizon</span><span>Wheel: radius = elevation (centre = top of scale shown, outer ring = −8°, scale zoomed per site); N up, E right. ★ highlight = best among selected.</span>
+            <span><i className="sw terrain" /> LOLA horizon (40 m)</span><span><i className="sw alt" /> 240 m-DEM horizon</span>
+            <span>Wheel: radius = elevation, N up, E right. Grey ranges = uncertainty envelope. ★ = best among selected.</span>
           </section>
           <section>
-            <h3>Timeline <small>(click to move the time cursor)</small></h3>
+            <h3>Timeline <small>(10-min resolution; click to move the cursor)</small></h3>
             <Timeline rows={items.map(i => ({ name: i.d.name, s: i.s }))} from={fromMs} to={toMs} cursorMs={cursorMs}
               onPick={ms => setCursorFrac(Math.min(1, Math.max(0, (ms - fromMs) / (toMs - fromMs))))} />
           </section>
-        </main>)}
-      <footer>Real data: NASA LRO LOLA DEMs (PDS) + NAIF SPICE DE440 ephemerides, validated against JPL Horizons. Not an official NASA product. Built for NASA Space Apps 2026.</footer>
+        </>}
+        {tab === 'map' && products && <MapView products={products} index={index} selected={selected} layers={layers}
+          onToggle={toggle} onPick={(lat, lon) => { if (grid) { addCustom(lat, lon, grid); setTab('compare') } }} />}
+        {tab === '3d' && products && <Suspense fallback={<p>Loading 3D…</p>}><Terrain3D products={products} index={index} selected={selected} sunVec={sunVec} /></Suspense>}
+        {tab === 'rank' && products && <RankView rows={rankRows} products={products} goal={goal} setGoal={setGoal} />}
+        {tab === 'power' && <PowerComms items={items} />}
+        {tab === 'missions' && <Missions />}
+        {tab === 'methods' && <Methods index={index} layers={layers} />}
+        {layers.length > 0 && tab === 'map' && <section className="layers"><h3>Chandrayaan-3 layers (ISRO)</h3>{layers.map(l => <LayerCard key={l.id} l={l} />)}</section>}
+      </main>
+      <footer>Real data: NASA LRO LOLA (PDS), NASA GSFC PGDA illumination maps, NASA JPL NAIF SPICE (DE440){layers.length ? ', ISRO Chandrayaan-3 results (see Methods for attribution)' : ''}. Built with AI assistance (see Methods §7). Not an official NASA or ISRO product. NASA Space Apps 2026.</footer>
     </div>
+  )
+}
+
+function LayerCard({ l }: { l: IsroLayer }) {
+  const f0 = l.features[0]?.properties ?? {}
+  const isTemps = l.features.length > 5
+  const temps = isTemps ? l.features.map(f => Number(f.properties.absolute_T_K)).filter(Number.isFinite) : []
+  return (
+    <article className="card layer">
+      <h4>{l.title}</h4>
+      {isTemps ? <p>{l.features.length} points within ~350 m of ChaSTE; absolute temperature {Math.min(...temps).toFixed(0)}–{Math.max(...temps).toFixed(0)} K (local times as given in source).</p> : (
+        <dl className="kv">{['name', 'landed_utc', 'chaste_peak_surface_T_K', 'chaste_flat_surface_T_K', 'diviner_predicted_T_K', 'apxs_n_obs'].filter(k => f0[k] != null).map(k => <div key={k}><dt>{k.replace(/_/g, ' ')}</dt><dd>{String(f0[k])}</dd></div>)}
+          {f0.apxs_mean_wt_pct != null && <div><dt>APXS mean wt%</dt><dd>{Object.entries(f0.apxs_mean_wt_pct as Record<string, number>).map(([k, v]) => `${k} ${v.toFixed(2)}`).join(', ')}</dd></div>}</dl>)}
+      <p className="small">{l.attribution} — {l.licence}</p>
+    </article>
   )
 }

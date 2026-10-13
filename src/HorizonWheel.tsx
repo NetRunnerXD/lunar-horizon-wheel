@@ -1,11 +1,11 @@
 import * as d3 from 'd3'
 import { useMemo } from 'react'
-import type { Series } from './metrics'
+import type { Series } from './physics'
 
 const EL_MIN = -8
 
-export function HorizonWheel({ horizon, step, s, cursor, size = 300 }: {
-  horizon: number[]; step: number; s: Series; cursor: number | null; size?: number
+export function HorizonWheel({ horizon, alt, step, s, cursor, size = 300, label }: {
+  horizon: number[]; alt?: number[]; step: number; s: Series; cursor: number | null; size?: number; label?: string
 }) {
   const R = size / 2 - 22
   const top = Math.max(...horizon, 4)
@@ -28,12 +28,13 @@ export function HorizonWheel({ horizon, step, s, cursor, size = 300 }: {
   const ci = cursor
   return (
     <svg viewBox={`${-size / 2} ${-size / 2} ${size} ${size}`} width="100%" role="img"
-      aria-label="Horizon wheel: terrain horizon with Sun and Earth paths" className="wheel">
+      aria-label={label ?? 'Horizon wheel: terrain horizon with Sun and Earth paths'} className="wheel">
       <circle r={R} className="sky" />
       {rings.filter(e => e < EL_MAX).map(e => <circle key={e} r={r(e)} className={e === 0 ? 'ring ring0' : 'ring'} />)}
       {d3.range(0, 360, 30).map(a => { const [x, y] = pt(a, EL_MIN); return <line key={a} x1={0} y1={0} x2={x} y2={y} className="spoke" /> })}
       <path d={terrain} className="terrain" fillRule="evenodd" />
       <path d={'M' + horizon.map((h, i) => pt((i + 0.5) * step, h).join(',')).join('L') + 'Z'} className="horizon-line" />
+      {alt && <path d={'M' + alt.map((h, i) => pt((i + 0.5) * (360 / alt.length), h).join(',')).join('L') + 'Z'} className="horizon-alt"><title>Horizon from 240 m DEM only (DEM-resolution uncertainty)</title></path>}
       {idx.map(i => { const [x, y] = pt(s.earthAz[i], s.earthEl[i]); return <circle key={'e' + i} cx={x} cy={y} r={1.2} className={s.earthVis[i] ? 'earth-up' : 'earth-down'} /> })}
       {idx.map(i => { const [x, y] = pt(s.sunAz[i], s.sunEl[i]); return <circle key={'s' + i} cx={x} cy={y} r={1.2} className={s.sunFrac[i] >= 0.5 ? 'sun-up' : 'sun-down'} /> })}
       {ci != null && ci >= 0 && ci < s.t.length && (<>

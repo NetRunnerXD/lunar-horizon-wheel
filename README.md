@@ -4,55 +4,58 @@
 
 A NASA Space Apps 2026 prototype for the **"CLPS Lunar Mission Browser"** challenge. It lets mission planners, educators, and the public compare Moon south-pole landing sites and dates by showing where the **Sun** and **Earth** sit relative to each site's **real terrain horizon**. That tells you how much solar power a site gets and when it can talk directly to Earth.
 
-## What it does
-- **Horizon wheel** per site: a polar sky plot with the LOLA terrain silhouette, the Sun and Earth tracks for the chosen dates (lit or hidden), and their positions at the scrubbed time.
-- **Metrics** for any date range: % sunlit (solar-disk fraction), **longest dark stretch** (battery sizing), % Earth in view, **direct-to-Earth (DTE) contact windows**, % with Sun and Earth together, and a relative power proxy.
-- **Side-by-side comparison** of 2–4 sites, with the best value per metric highlighted ★.
-- **Timeline** (Gantt-style) of sunlight and Earth visibility for all selected sites. Click it to move the time cursor.
-- **Date range picker** (2026–2028) with presets (14 d, 1 lunar day, 90 d, 1 yr) and a time scrubber.
-- **Export**: summary CSV, JSON with every DTE window, and hourly CSV (az/el, terrain height, visibility). Shareable URLs keep the selected sites and dates.
-- **Methods & data** page with the validation table, assumptions, and citations.
+## What it does (v2, research grade)
+- **Horizon wheel** per site: the LOLA terrain silhouette (40 m, with the 240 m-DEM horizon dashed as an uncertainty cue), plus Sun and Earth tracks at a **10-minute step**. Press ▶ to animate.
+- **Metrics with error ranges**: sunlit % (finite **limb-darkened** solar disk), longest dark, Earth in view, **DSN contact** (Goldstone/Madrid/Canberra ≥10° *and* Earth above the terrain), Sun + Earth, and a power index. Each range spans time step × Sun-disk model × DEM resolution.
+- **Map & custom site**: a south-pole map with NASA Goddard (PGDA/LOLA) average-illumination and Earth-visibility heatmaps and a PSR overlay. Click anywhere (or use the arrow keys + Enter) to analyse a custom point in the browser from a shipped 5 km horizon grid.
+- **3D terrain** (Three.js, LOLA 40 m resampled), lit by the real Sun direction at the time cursor, with switchable PGDA/PSR textures.
+- **Rank** sites by mission goal (solar power, comms, PSR/ice access, balanced).
+- **Power & comms**: battery sizing from the actual light/dark sequence, and an X/S-band link budget with every assumption labelled, giving data rate and data volume over DSN contacts.
+- **CLPS mission catalog** (past and planned landers, with sources).
+- **ISRO Chandrayaan-3 layers**: Shiv Shakti point as a full site (240 m DEM), ChaSTE/APXS/LIBS/RAMBHA results, and LRO Diviner temperatures near ChaSTE, all attributed.
+- **Exports**: PDF report, summary CSV, JSON with all DTE/DSN windows, a 10-minute CSV, and share links (including custom points).
+- **Accessible and responsive**: ARIA tabs with arrow-key navigation, keyboard map picker, skip link, focus rings, high-contrast dark theme, reduced-motion support, mobile layout.
 
-12 sites: USGS-Gazetteer centres of Shackleton, de Gerlache, Haworth, Faustini, Nobile, Shoemaker, Mons Malapert, and Mons Mouton (the IM-2 CLPS target region), plus 4 derived high points (Shackleton and de Gerlache rim highs, Malapert and Mouton summits) found from the DEM. Derived sites are illustrative, **not** official landing sites.
+## Validation (headline numbers; details in [docs/validation.md](docs/validation.md))
+| Check | Result |
+|---|---|
+| vs NASA GSFC PGDA 18.6-yr avg Sun visibility, 3,721-node grid | bias −0.87 pp, RMSE 4.55 pp, r = 0.955 |
+| vs PGDA avg Earth visibility, grid | bias −0.91 pp, RMSE 6.63 pp, r = 0.962 |
+| vs PGDA 60 m Sun at sites (best pixel ≤150 m) | bias +1.23 pp, RMSE 3.54 pp, r = 0.997 |
+| Geometry vs JPL Horizons (10 epochs) | ≤ 2.3×10⁻⁵° elevation, ≤ 5.6×10⁻⁷° azimuth |
+| 10-min interpolation vs direct SPICE | ≤ 1.9×10⁻⁶° |
+| TS (browser) vs Python reference, 2027, all sites | < 0.3 pp (enforced in tests) |
+
+Uncertainty is dominated by DEM resolution (up to ~26 pp on steep slopes); time step and Sun-disk model contribute ≤ 0.2 pp.
+
+## Sites
+Gazetteer centres of Shackleton, de Gerlache, Haworth, Faustini, Nobile, Shoemaker, Mons Malapert and Mons Mouton; 4 DEM-derived high points (**illustrative, not official landing sites**); and the Chandrayaan-3 Shiv Shakti point. Users can add their own points on the map.
 
 ## Data sources (all real, all free)
 | Data | Source |
 |---|---|
-| Terrain: LOLA polar DEMs `LDEM_85S_40M` (40 m) and `LDEM_75S_240M` (240 m) | NASA LRO LOLA, PDS Geosciences Node: https://pds-geosciences.wustl.edu/missions/lro/lola.htm |
-| Sun/Earth ephemerides: DE440 (`de440s.bsp`), `moon_pa_de440_200625.bpc`, `moon_de440_250416.tf`, `naif0012.tls`, `pck00011.tpc` | NAIF SPICE generic kernels: https://naif.jpl.nasa.gov/pub/naif/generic_kernels/ |
-| Validation of Sun/Earth az/el | JPL Horizons API: https://ssd.jpl.nasa.gov/api/horizons.api |
-| Feature coordinates | USGS Gazetteer of Planetary Nomenclature: https://planetarynames.wr.usgs.gov/ |
+| LOLA DEMs `LDEM_80S_40M`, `LDEM_60S_240M` | NASA PDS Geosciences Node (public domain) |
+| Avg. Sun/Earth visibility + PSR maps (`AVGVISIB_*_201608`, `LPSR_65S_240M_201608`) | NASA GSFC PGDA product 69 / LOLA PDS (public domain) |
+| DE440 + lunar orientation + frames kernels | NASA JPL NAIF SPICE |
+| Geometry check | JPL Horizons API |
+| DSN station coordinates (approx.) | DSN 810-005 |
+| CLPS catalog | NASA CLPS page, provider pages, NASA statements (Sep 2026) |
+| Chandrayaan-3 values | ISRO releases; Durga Prasad et al. 2025 (CC BY-NC-ND 4.0); Vadawale et al. 2024 (cited values); MNRAS 542:2647. LRO Diviner temperatures via Durga Prasad et al. Suppl. Data 1 |
 
-## Methods (short; full version on the in-app Methods page)
-1. **Sun and Earth positions**: SpiceyPy `spkcpo` from a fixed surface observer (2 m above the LOLA surface) in `MOON_ME_DE440_ME421`, with LT+S aberration. Hourly, 2026-01-01 to 2028-12-31, rotated into local East-North-Up to get azimuth and elevation. **Validated against JPL Horizons: max error 0.005° across 10 checks** (`public/data/validation.json`).
-2. **Terrain horizon**: every DEM pixel within 400 km (40 m DEM ≤25 km, 240 m DEM beyond; 240 m only for sites north of 85.2°S) is placed in 3-D on the 1737.4 km sphere plus its height (so curvature is exact). The maximum elevation angle in each 0.5° azimuth bin gives the horizon.
-3. **Visibility**: Sun disk fraction = linear approximation across its 0.53° diameter relative to the horizon at its azimuth. Earth is visible when its centre is above the horizon. All metrics are computed in the browser for whatever range you pick.
+Chandrayaan-2 OHRC/TMC-2/DFSAR and Chandrayaan-3 instrument L1/L2 data need an ISSDC PRADAN login, so they are not included (see `docs/isro-layers.md`).
 
-**Sanity check (2027):** Shackleton rim high point is 86% sunlit (literature: about 80–90%), the Shackleton, Haworth, and Faustini floors are 0% (known permanently shadowed regions), and Mons Malapert keeps Earth in view 100% of the time.
+## Methods
+See **[METHODS.md](METHODS.md)** (paper-style write-up with references) and the in-app *Methods & validation* tab.
 
-### Approximations and limits
-40 m and 240 m terrain (no boulder-scale features), no terrain beyond 400 km, hourly sampling (±1 h), linear Sun-disk model, Earth treated as a point, geometric line-of-sight only (no DSN scheduling or link budget). Not yet cross-validated against PGDA illumination maps. Custom sites need a pipeline rerun.
+## Limitations
+Line-of-sight geometry only (no scattered light or thermal model). DEM resolution limits near-field horizons (40 m; 240 m-only for Shiv Shakti). Custom sites use 5 km / 2° grid horizons. Derived crest sites are single pixels and fragile (see validation §A). The link budget and power sizing are screening tools with representative assumptions. DSN scheduling is ignored. The CLPS statuses change often.
+
+## AI-use disclosure
+This project was built with substantial help from AI assistants: code generation, data-source research, and drafting of the documentation, directed and reviewed by the team. All data comes from the real sources listed above via the reproducible pipeline. No values are AI-generated.
 
 ## Run it
 ```bash
-# front end (precomputed data is already in public/data)
-npm ci
-npm test         # unit tests + checks on the real data
-npm run dev      # http://localhost:5173/lunar-horizon-wheel/
-npm run build    # static site in dist/
-
-# regenerate the data (~190 MB download, ~1 min compute)
-pip install -r pipeline/requirements.txt
-./pipeline/fetch_data.sh                 # into ../raw (set LHW_RAW to change)
-python3 pipeline/precompute.py           # writes public/data/
-python3 pipeline/validate_horizons.py    # JPL Horizons spot checks
+npm ci && npm test && npm run dev        # front end; precomputed data is in public/data
+make all                                 # full pipeline (or pipeline/run_all.sh): pinned venv, ~1.3 GB data, ~3 min compute
 ```
-Add a site by editing `GAZ` or `derived` in `pipeline/precompute.py`. Deployment: GitHub Actions → GitHub Pages (`.github/workflows/pages.yml`).
-
-Stack: Python (SpiceyPy, NumPy) precompute → static JSON → React + TypeScript + Vite + D3. No backend, no paid services.
-
-## AI-use disclosure
-This prototype's code, data pipeline, and documentation were written with the help of AI assistants (Grok Bot agents) directed by the team. All data and numbers come from the NASA/JPL/USGS sources above, processed by the code in this repo. No AI-generated imagery or data is used.
-
-## License
-MIT (see `LICENSE`). Input data are NASA/USGS public-domain products. This is not an official NASA product.
+Pipeline: `fetch_data.sh` → `precompute.py` (site horizons) → `products.py` (ephemeris, DSN, grid, terrain, overlays, PSR stats) → `validate.py` (PGDA comparison, interpolation, sensitivity → `docs/validation.md`). Deployment: GitHub Actions → GitHub Pages.

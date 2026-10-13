@@ -1,0 +1,539 @@
+{
+ "period": "2027-01-01..2028-01-01 UTC",
+ "reference": "2-min step, limb-darkened disk, 40 m near-field DEM",
+ "sites": [
+  {
+   "id": "shackleton",
+   "name": "Shackleton (centre)",
+   "reference": {
+    "sunlit": -0.0,
+    "dark_h": 8760.0,
+    "earth": 0.0
+   },
+   "variants": {
+    "step_10min": {
+     "sunlit": -0.0,
+     "dark_h": 8760.0,
+     "earth": 0.0
+    },
+    "step_60min": {
+     "sunlit": -0.0,
+     "dark_h": 8760.0,
+     "earth": 0.0
+    },
+    "disk_point": {
+     "sunlit": 0.0,
+     "dark_h": 8760.0,
+     "earth": 0.0
+    },
+    "disk_linear": {
+     "sunlit": 0.0,
+     "dark_h": 8760.0,
+     "earth": 0.0
+    },
+    "disk_uniform": {
+     "sunlit": 0.0,
+     "dark_h": 8760.0,
+     "earth": 0.0
+    },
+    "dem_240m": {
+     "sunlit": -0.0,
+     "dark_h": 8760.0,
+     "earth": 0.0
+    }
+   }
+  },
+  {
+   "id": "de-gerlache",
+   "name": "de Gerlache (centre)",
+   "reference": {
+    "sunlit": -0.0,
+    "dark_h": 8760.0,
+    "earth": 0.0
+   },
+   "variants": {
+    "step_10min": {
+     "sunlit": -0.0,
+     "dark_h": 8760.0,
+     "earth": 0.0
+    },
+    "step_60min": {
+     "sunlit": -0.0,
+     "dark_h": 8760.0,
+     "earth": 0.0
+    },
+    "disk_point": {
+     "sunlit": 0.0,
+     "dark_h": 8760.0,
+     "earth": 0.0
+    },
+    "disk_linear": {
+     "sunlit": 0.0,
+     "dark_h": 8760.0,
+     "earth": 0.0
+    },
+    "disk_uniform": {
+     "sunlit": 0.0,
+     "dark_h": 8760.0,
+     "earth": 0.0
+    },
+    "dem_240m": {
+     "sunlit": 0.047,
+     "dark_h": 4956.5,
+     "earth": 0.006
+    }
+   }
+  },
+  {
+   "id": "haworth",
+   "name": "Haworth (centre)",
+   "reference": {
+    "sunlit": -0.0,
+    "dark_h": 8760.0,
+    "earth": 0.0
+   },
+   "variants": {
+    "step_10min": {
+     "sunlit": -0.0,
+     "dark_h": 8760.0,
+     "earth": 0.0
+    },
+    "step_60min": {
+     "sunlit": -0.0,
+     "dark_h": 8760.0,
+     "earth": 0.0
+    },
+    "disk_point": {
+     "sunlit": 0.0,
+     "dark_h": 8760.0,
+     "earth": 0.0
+    },
+    "disk_linear": {
+     "sunlit": 0.0,
+     "dark_h": 8760.0,
+     "earth": 0.0
+    },
+    "disk_uniform": {
+     "sunlit": 0.0,
+     "dark_h": 8760.0,
+     "earth": 0.0
+    },
+    "dem_240m": {
+     "sunlit": -0.0,
+     "dark_h": 8760.0,
+     "earth": 0.0
+    }
+   }
+  },
+  {
+   "id": "faustini",
+   "name": "Faustini (centre)",
+   "reference": {
+    "sunlit": -0.0,
+    "dark_h": 8760.0,
+    "earth": 0.0
+   },
+   "variants": {
+    "step_10min": {
+     "sunlit": -0.0,
+     "dark_h": 8760.0,
+     "earth": 0.0
+    },
+    "step_60min": {
+     "sunlit": -0.0,
+     "dark_h": 8760.0,
+     "earth": 0.0
+    },
+    "disk_point": {
+     "sunlit": 0.0,
+     "dark_h": 8760.0,
+     "earth": 0.0
+    },
+    "disk_linear": {
+     "sunlit": 0.0,
+     "dark_h": 8760.0,
+     "earth": 0.0
+    },
+    "disk_uniform": {
+     "sunlit": 0.0,
+     "dark_h": 8760.0,
+     "earth": 0.0
+    },
+    "dem_240m": {
+     "sunlit": -0.0,
+     "dark_h": 8760.0,
+     "earth": 0.0
+    }
+   }
+  },
+  {
+   "id": "nobile",
+   "name": "Nobile (centre)",
+   "reference": {
+    "sunlit": 34.318,
+    "dark_h": 515.933,
+    "earth": 20.72
+   },
+   "variants": {
+    "step_10min": {
+     "sunlit": 34.318,
+     "dark_h": 516.0,
+     "earth": 20.725
+    },
+    "step_60min": {
+     "sunlit": 34.313,
+     "dark_h": 516.0,
+     "earth": 20.719
+    },
+    "disk_point": {
+     "sunlit": 34.33,
+     "dark_h": 516.0,
+     "earth": 20.725
+    },
+    "disk_linear": {
+     "sunlit": 34.316,
+     "dark_h": 516.0,
+     "earth": 20.725
+    },
+    "disk_uniform": {
+     "sunlit": 34.317,
+     "dark_h": 516.0,
+     "earth": 20.725
+    },
+    "dem_240m": {
+     "sunlit": 34.432,
+     "dark_h": 515.5,
+     "earth": 20.911
+    }
+   }
+  },
+  {
+   "id": "mons-malapert",
+   "name": "Mons Malapert (gazetteer centre)",
+   "reference": {
+    "sunlit": 48.702,
+    "dark_h": 294.133,
+    "earth": 100.0
+   },
+   "variants": {
+    "step_10min": {
+     "sunlit": 48.714,
+     "dark_h": 294.0,
+     "earth": 100.0
+    },
+    "step_60min": {
+     "sunlit": 48.536,
+     "dark_h": 294.0,
+     "earth": 100.0
+    },
+    "disk_point": {
+     "sunlit": 48.638,
+     "dark_h": 294.0,
+     "earth": 100.0
+    },
+    "disk_linear": {
+     "sunlit": 48.743,
+     "dark_h": 294.0,
+     "earth": 100.0
+    },
+    "disk_uniform": {
+     "sunlit": 48.721,
+     "dark_h": 294.0,
+     "earth": 100.0
+    },
+    "dem_240m": {
+     "sunlit": 74.94,
+     "dark_h": 288.0,
+     "earth": 100.0
+    }
+   }
+  },
+  {
+   "id": "mons-mouton",
+   "name": "Mons Mouton (gazetteer centre)",
+   "reference": {
+    "sunlit": 26.741,
+    "dark_h": 628.433,
+    "earth": 55.245
+   },
+   "variants": {
+    "step_10min": {
+     "sunlit": 26.741,
+     "dark_h": 628.5,
+     "earth": 55.245
+    },
+    "step_60min": {
+     "sunlit": 26.742,
+     "dark_h": 629.0,
+     "earth": 55.251
+    },
+    "disk_point": {
+     "sunlit": 26.61,
+     "dark_h": 628.5,
+     "earth": 55.245
+    },
+    "disk_linear": {
+     "sunlit": 26.783,
+     "dark_h": 628.5,
+     "earth": 55.245
+    },
+    "disk_uniform": {
+     "sunlit": 26.751,
+     "dark_h": 628.5,
+     "earth": 55.245
+    },
+    "dem_240m": {
+     "sunlit": 28.948,
+     "dark_h": 491.5,
+     "earth": 57.588
+    }
+   }
+  },
+  {
+   "id": "shoemaker",
+   "name": "Shoemaker (centre)",
+   "reference": {
+    "sunlit": -0.0,
+    "dark_h": 8760.0,
+    "earth": 16.659
+   },
+   "variants": {
+    "step_10min": {
+     "sunlit": -0.0,
+     "dark_h": 8760.0,
+     "earth": 16.665
+    },
+    "step_60min": {
+     "sunlit": -0.0,
+     "dark_h": 8760.0,
+     "earth": 16.667
+    },
+    "disk_point": {
+     "sunlit": 0.0,
+     "dark_h": 8760.0,
+     "earth": 16.665
+    },
+    "disk_linear": {
+     "sunlit": 0.0,
+     "dark_h": 8760.0,
+     "earth": 16.665
+    },
+    "disk_uniform": {
+     "sunlit": 0.0,
+     "dark_h": 8760.0,
+     "earth": 16.665
+    },
+    "dem_240m": {
+     "sunlit": -0.0,
+     "dark_h": 8760.0,
+     "earth": 16.313
+    }
+   }
+  },
+  {
+   "id": "shackleton-rim-high",
+   "name": "Shackleton rim high point",
+   "reference": {
+    "sunlit": 86.144,
+    "dark_h": 70.033,
+    "earth": 49.51
+   },
+   "variants": {
+    "step_10min": {
+     "sunlit": 86.144,
+     "dark_h": 70.167,
+     "earth": 49.513
+    },
+    "step_60min": {
+     "sunlit": 86.121,
+     "dark_h": 70.0,
+     "earth": 49.543
+    },
+    "disk_point": {
+     "sunlit": 86.338,
+     "dark_h": 70.167,
+     "earth": 49.513
+    },
+    "disk_linear": {
+     "sunlit": 86.065,
+     "dark_h": 70.167,
+     "earth": 49.513
+    },
+    "disk_uniform": {
+     "sunlit": 86.126,
+     "dark_h": 70.167,
+     "earth": 49.513
+    },
+    "dem_240m": {
+     "sunlit": 85.089,
+     "dark_h": 72.833,
+     "earth": 49.433
+    }
+   }
+  },
+  {
+   "id": "de-gerlache-rim-high",
+   "name": "de Gerlache rim high point",
+   "reference": {
+    "sunlit": 83.007,
+    "dark_h": 269.7,
+    "earth": 54.738
+   },
+   "variants": {
+    "step_10min": {
+     "sunlit": 83.008,
+     "dark_h": 269.667,
+     "earth": 54.739
+    },
+    "step_60min": {
+     "sunlit": 83.018,
+     "dark_h": 270.0,
+     "earth": 54.726
+    },
+    "disk_point": {
+     "sunlit": 83.069,
+     "dark_h": 269.667,
+     "earth": 54.739
+    },
+    "disk_linear": {
+     "sunlit": 83.003,
+     "dark_h": 269.667,
+     "earth": 54.739
+    },
+    "disk_uniform": {
+     "sunlit": 83.008,
+     "dark_h": 269.667,
+     "earth": 54.739
+    },
+    "dem_240m": {
+     "sunlit": 84.166,
+     "dark_h": 149.333,
+     "earth": 54.692
+    }
+   }
+  },
+  {
+   "id": "malapert-summit",
+   "name": "Mons Malapert summit (DEM max)",
+   "reference": {
+    "sunlit": 78.312,
+    "dark_h": 265.933,
+    "earth": 81.351
+   },
+   "variants": {
+    "step_10min": {
+     "sunlit": 78.313,
+     "dark_h": 266.0,
+     "earth": 81.353
+    },
+    "step_60min": {
+     "sunlit": 78.307,
+     "dark_h": 271.0,
+     "earth": 81.347
+    },
+    "disk_point": {
+     "sunlit": 78.291,
+     "dark_h": 266.0,
+     "earth": 81.353
+    },
+    "disk_linear": {
+     "sunlit": 78.291,
+     "dark_h": 266.0,
+     "earth": 81.353
+    },
+    "disk_uniform": {
+     "sunlit": 78.309,
+     "dark_h": 266.0,
+     "earth": 81.353
+    },
+    "dem_240m": {
+     "sunlit": 82.624,
+     "dark_h": 264.5,
+     "earth": 100.0
+    }
+   }
+  },
+  {
+   "id": "mouton-summit",
+   "name": "Mons Mouton summit (DEM max)",
+   "reference": {
+    "sunlit": 48.293,
+    "dark_h": 409.933,
+    "earth": 100.0
+   },
+   "variants": {
+    "step_10min": {
+     "sunlit": 48.293,
+     "dark_h": 410.0,
+     "earth": 100.0
+    },
+    "step_60min": {
+     "sunlit": 48.293,
+     "dark_h": 410.0,
+     "earth": 100.0
+    },
+    "disk_point": {
+     "sunlit": 48.312,
+     "dark_h": 410.0,
+     "earth": 100.0
+    },
+    "disk_linear": {
+     "sunlit": 48.279,
+     "dark_h": 410.0,
+     "earth": 100.0
+    },
+    "disk_uniform": {
+     "sunlit": 48.29,
+     "dark_h": 410.0,
+     "earth": 100.0
+    },
+    "dem_240m": {
+     "sunlit": 50.7,
+     "dark_h": 257.333,
+     "earth": 99.49
+    }
+   }
+  },
+  {
+   "id": "shiv-shakti",
+   "name": "Shiv Shakti point (Chandrayaan-3)",
+   "reference": {
+    "sunlit": 46.821,
+    "dark_h": 382.4,
+    "earth": 100.0
+   },
+   "variants": {
+    "step_10min": {
+     "sunlit": 46.821,
+     "dark_h": 382.333,
+     "earth": 100.0
+    },
+    "step_60min": {
+     "sunlit": 46.813,
+     "dark_h": 383.0,
+     "earth": 100.0
+    },
+    "disk_point": {
+     "sunlit": 46.842,
+     "dark_h": 382.333,
+     "earth": 100.0
+    },
+    "disk_linear": {
+     "sunlit": 46.817,
+     "dark_h": 382.333,
+     "earth": 100.0
+    },
+    "disk_uniform": {
+     "sunlit": 46.82,
+     "dark_h": 382.333,
+     "earth": 100.0
+    },
+    "dem_240m": {
+     "sunlit": 46.821,
+     "dark_h": 382.333,
+     "earth": 100.0
+    }
+   }
+  }
+ ]
+}

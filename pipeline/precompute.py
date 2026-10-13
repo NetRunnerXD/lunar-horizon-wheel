@@ -1,8 +1,10 @@
-"""Precompute per-site terrain horizons (LOLA) and Sun/Earth topocentric az/el (SPICE DE440).
+"""Stage 1: per-site terrain horizons from LOLA (exhaustive DEM-pixel scan, 0.5 deg bins) at two DEM resolutions.
 Outputs ../public/data/sites.json and ../public/data/sites/<id>.json"""
 import json, os, time
 import numpy as np, spiceypy as sp
-from dem import load, R, RAW
+from dem import load, R, RAW, Raster
+from geom import kernels, cart, enu, FRAME
+import spiceypy as sp
 
 OUT = os.path.join(os.path.dirname(__file__), "..", "public", "data")
 START, END, STEP_H = "2026-01-01T00:00:00", "2029-01-01T00:00:00", 1
@@ -18,12 +20,10 @@ GAZ = {
     "mons-mouton": ("Mons Mouton", -84.60, 31.00, 130.0), "shoemaker": ("Shoemaker", -88.14, 45.91, 51.82),
 }
 
-def kernels():
-    for k in ["naif0012.tls", "pck00011.tpc", "de440s.bsp", "moon_pa_de440_200625.bpc", "moon_de440_250416.tf"]:
-        sp.furnsh(os.path.join(RAW, k))
-
-def pick_dem(fine, coarse, lat):
-    return fine if lat < -85.2 else coarse
+def pick_dem(fine, coarse, lat, lon=0.0):
+    x, y = Raster.xy_from_ll(lat, lon)
+    # need the full 25 km near-field inside the fine DEM
+    return fine if np.hypot(x, y) < fine.n * fine.scale / 2 - 30e3 else coarse
 
 def max_in_disk(dem, lat, lon, r_in_m, r_out_m):
     x0, y0 = dem.xy_from_ll(lat, lon)
@@ -49,27 +49,19 @@ def sites(fine, coarse):
                ("mouton-summit", "Mons Mouton summit (DEM max)", "mons-mouton", 0.0, 0.15)]
     for sid, nm, g, a, b in derived:
         _, la, lo, D = GAZ[g]
-        dem = pick_dem(fine, coarse, la)
+        dem = pick_dem(fine, coarse, la, lo)
         lat, lon = max_in_disk(dem, la, lo, a * D * 1000, b * D * 1000)
         S.append(dict(id=sid, name=nm, lat=round(float(lat), 4), lon=round(float(lon), 4), kind="derived",
                       note=f"Highest LOLA DEM pixel {a*D:.1f}-{b*D:.1f} km from the gazetteer centre of {GAZ[g][0]}; "
                            "an illustrative candidate, not an official landing site."))
+    # ISRO Chandrayaan-3 landing point (Shiv Shakti); coordinates per ISRO (2023) as compiled in ../isro/manifest.json
+    S.append(dict(id="shiv-shakti", name="Shiv Shakti point (Chandrayaan-3)", lat=-69.3733, lon=32.3186, kind="isro",
+                  note="Chandrayaan-3 Vikram landing point (ISRO). Outside the 40 m DEM: horizon from LOLA LDEM_60S_240M only."))
     return S
-
-def cart(lat, lon, r):
-    la, lo = np.radians(lat), np.radians(lon)
-    return np.stack([r * np.cos(la) * np.cos(lo), r * np.cos(la) * np.sin(lo), r * np.sin(la)], -1)
-
-def enu(lat, lon):
-    la, lo = np.radians(lat), np.radians(lon)
-    U = np.array([np.cos(la) * np.cos(lo), np.cos(la) * np.sin(lo), np.sin(la)])
-    E = np.array([-np.sin(lo), np.cos(lo), 0.0])
-    N = np.cross(U, E)
-    return E, N, U
 
 def horizon(fine, coarse, lat, lon):
     E, N, U = enu(lat, lon)
-    near_dem = pick_dem(fine, coarse, lat)
+    near_dem = pick_dem(fine, coarse, lat, lon)
     h0 = float(near_dem.height(lat, lon))
     P = cart(lat, lon, R + h0 + MAST_M)
     hz = np.full(NBINS, -90.0)
@@ -97,43 +89,25 @@ def horizon(fine, coarse, lat, lon):
             np.maximum.at(hz, b, el)
     return h0, hz
 
-def ephem(lat, lon, h0, ets):
-    E, N, U = enu(lat, lon)
-    obs = cart(lat, lon, (R + h0 + MAST_M) / 1000.0)
-    out = {}
-    for body in ("SUN", "EARTH"):
-        az, el = np.empty(len(ets)), np.empty(len(ets))
-        for i, et in enumerate(ets):
-            v, _ = sp.spkcpo(body, et, "MOON_ME_DE440_ME421", "OBSERVER", "LT+S", obs, "MOON", "MOON_ME_DE440_ME421")
-            v = np.array(v[:3])
-            e, n, u = v @ E, v @ N, v @ U
-            el[i] = np.degrees(np.arctan2(u, np.hypot(e, n)))
-            az[i] = np.degrees(np.arctan2(e, n)) % 360
-        out[body] = (az, el)
-    return out
 
 def main():
-    kernels()
     fine, coarse = load()
     os.makedirs(os.path.join(OUT, "sites"), exist_ok=True)
-    et0, et1 = sp.str2et(START), sp.str2et(END)
-    ets = np.arange(et0, et1, STEP_H * 3600.0)
     index = []
     for s in sites(fine, coarse):
         t = time.time()
         h0, hz = horizon(fine, coarse, s["lat"], s["lon"])
-        hz = np.where(hz < -89, 0.0, hz)
-        eph = ephem(s["lat"], s["lon"], h0, ets)
-        s.update(elevation_m=round(h0, 1), dem="LDEM_85S_40M + LDEM_75S_240M" if s["lat"] < -85.2 else "LDEM_75S_240M")
-        rec = dict(s, start=START + "Z", step_hours=STEP_H, n=len(ets), horizon_step_deg=360 / NBINS,
-                   horizon=[round(float(v), 2) for v in hz],
-                   sun_az=np.round(eph["SUN"][0] * 100).astype(int).tolist(), sun_el=np.round(eph["SUN"][1] * 100).astype(int).tolist(),
-                   earth_az=np.round(eph["EARTH"][0] * 100).astype(int).tolist(), earth_el=np.round(eph["EARTH"][1] * 100).astype(int).tolist())
+        _, hzc = horizon(coarse, coarse, s["lat"], s["lon"])     # 240 m-only horizon for DEM-resolution sensitivity
+        hz = np.where(hz < -89, 0.0, hz); hzc = np.where(hzc < -89, 0.0, hzc)
+        s.update(elevation_m=round(h0, 1), dem="LDEM_80S_40M + LDEM_60S_240M" if pick_dem(fine, coarse, s["lat"], s["lon"]) is fine else "LDEM_60S_240M")
+        rec = dict(s, horizon_step_deg=360 / NBINS, mast_m=MAST_M,
+                   horizon=[round(float(v), 2) for v in hz], horizon_240m=[round(float(v), 2) for v in hzc])
         json.dump(rec, open(os.path.join(OUT, "sites", s["id"] + ".json"), "w"), separators=(",", ":"))
         index.append(s)
-        print(f"{s['id']:24s} lat {s['lat']:.3f} lon {s['lon']:.3f} h {h0:7.0f} m  max hz {hz.max():.2f}  {time.time()-t:.0f}s", flush=True)
-    json.dump(dict(generated=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), start=START + "Z", end=END + "Z",
-                   step_hours=STEP_H, sites=index), open(os.path.join(OUT, "sites.json"), "w"), indent=1)
+        print(f"{s['id']:24s} lat {s['lat']:.3f} lon {s['lon']:.3f} h {h0:7.0f} m  max hz {hz.max():.2f}  "
+              f"rms(40m-240m) {np.sqrt(np.mean((hz-hzc)**2)):.2f} deg  {time.time()-t:.0f}s", flush=True)
+    json.dump(dict(generated=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), sites=index),
+              open(os.path.join(OUT, "sites.json"), "w"), indent=1)
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,26 @@
+{
+ "as_of": "2026-10-13",
+ "note": "Status reflects public NASA statements as of mid-September 2026; dates for planned missions are targets and change often. Coordinates are approximate.",
+ "missions": [
+  {"name": "Peregrine Mission One", "provider": "Astrobotic", "launch": "2024-01-08", "status": "Failed (propellant leak after launch; re-entered 2024-01-18; no landing)", "target": "Sinus Viscositatis (planned)", "lat": null, "lon": null, "polar": false,
+   "source": "https://www.nasa.gov/commercial-lunar-payload-services/"},
+  {"name": "IM-1 Odysseus", "provider": "Intuitive Machines", "launch": "2024-02-15", "status": "Landed 2024-02-22, tipped over; partial success", "target": "Near Malapert A", "lat": -80.13, "lon": 1.44, "polar": true,
+   "source": "https://www.nasa.gov/missions/artemis/clps/nasa-instruments-on-intuitive-machines-im-1/ ; LROC landing-site image"},
+  {"name": "Blue Ghost Mission 1", "provider": "Firefly Aerospace", "launch": "2025-01-15", "status": "Landed 2025-03-02, full success (~14 days of surface ops)", "target": "Mare Crisium (Mons Latreille)", "lat": 18.56, "lon": 61.81, "polar": false,
+   "source": "https://fireflyspace.com/missions/blue-ghost-mission-1/"},
+  {"name": "IM-2 Athena", "provider": "Intuitive Machines", "launch": "2025-02-26", "status": "Landed 2025-03-06 on its side in a crater; mission ended early; partial success", "target": "Mons Mouton plateau", "lat": -84.8, "lon": 29.2, "polar": true,
+   "source": "https://www.nasa.gov/commercial-lunar-payload-services/ ; LROC landing-site image"},
+  {"name": "Griffin Mission One", "provider": "Astrobotic (Voyager Technologies)", "launch": "NET Nov 2026 (target)", "status": "Planned; Falcon Heavy; carries Astrolab FLIP rover", "target": "Mons Mouton / Nobile region", "lat": null, "lon": null, "polar": true,
+   "source": "NASA Moon Base program remarks, 15 Sep 2026 (Glenn Space Technology Symposium), as reported by SpaceNews"},
+  {"name": "Blue Moon MK1 \"Endurance\"", "provider": "Blue Origin", "launch": "First part of 2027 (target)", "status": "Planned pathfinder carrying NASA payloads", "target": "South-pole region", "lat": null, "lon": null, "polar": true,
+   "source": "NASA Moon Base program remarks, 15 Sep 2026"},
+  {"name": "IM-3 Nova-C \"Trinity\"", "provider": "Intuitive Machines", "launch": "First part of 2027 (target)", "status": "Planned", "target": "Reiner Gamma", "lat": 7.5, "lon": -59.0, "polar": false,
+   "source": "NASA Moon Base program remarks, 15 Sep 2026; https://www.nasa.gov/commercial-lunar-payload-services/"},
+  {"name": "Blue Ghost Mission 2", "provider": "Firefly Aerospace", "launch": "Later in 2027 (target)", "status": "Planned; far side with Elytra orbiter and ESA Lunar Pathfinder", "target": "Far side", "lat": null, "lon": null, "polar": false,
+   "source": "https://fireflyspace.com/missions/blue-ghost-mission-2/"},
+  {"name": "Blue Ghost Mission 3", "provider": "Firefly Aerospace", "launch": "2028 (target)", "status": "Planned", "target": "Gruithuisen Domes", "lat": null, "lon": null, "polar": false,
+   "source": "https://www.nasa.gov/commercial-lunar-payload-services/"},
+  {"name": "Blue Ghost Mission 4", "provider": "Firefly Aerospace", "launch": "2029 (target)", "status": "Planned", "target": "South-pole region", "lat": null, "lon": null, "polar": true,
+   "source": "https://www.nasa.gov/commercial-lunar-payload-services/"}
+ ]
+}

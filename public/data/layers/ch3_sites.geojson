@@ -1,0 +1,109 @@
+{
+ "type": "FeatureCollection",
+ "features": [
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     32.3186,
+     -69.3733
+    ]
+   },
+   "properties": {
+    "id": "ch3-shiv-shakti",
+    "name": "Shiv Shakti Point (Chandrayaan-3 Vikram landing site)",
+    "landed_utc": "2023-08-23T12:34Z",
+    "coord_source": "ISRO announced landing coordinates 69.3733 S, 32.3186 E as cited in arXiv:2602.14993 (Table/Note); ISRO APXS release gives 69.37 S, 32.32 E",
+    "chaste_peak_surface_T_K": 355,
+    "chaste_peak_surface_T_unc_K": 0.5,
+    "chaste_slope_deg": 6,
+    "chaste_flat_surface_T_K": 332,
+    "diviner_predicted_T_K": 330,
+    "chaste_ref": "Durga Prasad et al. 2025, Commun. Earth Environ., doi:10.1038/s43247-025-02114-6",
+    "apxs_mean_wt_pct": {
+     "Si": 20.251,
+     "Ti": 0.171,
+     "Al": 13.833,
+     "Fe": 4.841,
+     "Mn": 0.073,
+     "Mg": 4.895,
+     "Ca": 10.582,
+     "Na": 0.194,
+     "K": 0.038,
+     "Cr": 0.084,
+     "Ni": 0.034,
+     "S": 0.117
+    },
+    "apxs_std_wt_pct": {
+     "Si": 0.112,
+     "Ti": 0.025,
+     "Al": 0.134,
+     "Fe": 0.191,
+     "Mn": 0.006,
+     "Mg": 0.169,
+     "Ca": 0.252,
+     "Na": 0.06,
+     "K": 0.003,
+     "Cr": 0.004,
+     "Ni": 0.005,
+     "S": 0.01
+    },
+    "apxs_n_obs": 22,
+    "apxs_note": "mean of APXS observations excluding ObsID 15 (as in paper); computed here from Supplementary Data Abundance_Data sheet",
+    "apxs_ref": "Vadawale et al. 2024, Nature 634, doi:10.1038/s41586-024-07870-7",
+    "apxs_interpretation": "Ferroan anorthosite dominated, elevated Mg vs Ca suggests mafic admixture",
+    "libs_elements_detected": [
+     "Al",
+     "S",
+     "Ca",
+     "Fe",
+     "Cr",
+     "Ti",
+     "Mn",
+     "Si",
+     "O"
+    ],
+    "libs_ref": "ISRO release 2023-08-28 https://www.isro.gov.in/ISRO_EN/LIBSResults.html (qualitative, no abundances)",
+    "rambha_lp_electron_density_cm3": [
+     380,
+     600
+    ],
+    "rambha_lp_electron_temp_K": [
+     3000,
+     8000
+    ],
+    "rambha_window": "2023-08-24 to 2023-09-02, 2 m above surface",
+    "rambha_ref": "RAMBHA-LP, MNRAS 542(4):2647 (2025) https://academic.oup.com/mnras/article/542/4/2647/8223395",
+    "ps_x_m": 338052.3,
+    "ps_y_m": 534361.7,
+    "within_LDEM_75S": false,
+    "within_LDEM_85S": false
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     32.348126,
+     -69.367621
+    ]
+   },
+   "properties": {
+    "id": "ch3-prime-target",
+    "name": "Chandrayaan-3 planned prime landing site centre",
+    "ellipse_km": [
+     4,
+     2.4
+    ],
+    "orientation": "not published, so no polygon drawn",
+    "ref": "https://www.isro.gov.in/Chandrayaan3_New.html",
+    "ps_x_m": 338422.8,
+    "ps_y_m": 534337.7,
+    "within_LDEM_75S": false,
+    "within_LDEM_85S": false
+   }
+  }
+ ]
+}

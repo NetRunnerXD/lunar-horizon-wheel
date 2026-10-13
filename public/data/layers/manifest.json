@@ -1,0 +1,11 @@
+{
+ "about": "Optional site layers. Add an entry + GeoJSON point file here to add a layer; the app reads it at start-up. Source of the ISRO layers: /isro worker output (see docs/isro-layers.md).",
+ "layers": [
+  {"id": "ch3_sites", "title": "Chandrayaan-3: Shiv Shakti point & in-situ results", "file": "ch3_sites.geojson",
+   "attribution": "Chandrayaan-3 data: ISRO / PRL / SPL-VSSC / LEOS. ChaSTE: Durga Prasad et al. 2025, Commun. Earth Environ., doi:10.1038/s43247-025-02114-6 (CC BY-NC-ND 4.0). APXS: Vadawale et al. 2024, Nature, doi:10.1038/s41586-024-07870-7 (cited values). LIBS & site coordinates: ISRO releases. RAMBHA-LP: MNRAS 542(4):2647 (2025).",
+   "licence": "Factual values with attribution; ISRO web content has no stated open licence."},
+  {"id": "ch3_surface_temps_near_site", "title": "LRO Diviner (orbital) temperatures within ~350 m of ChaSTE", "file": "ch3_surface_temps_near_site.geojson",
+   "attribution": "LRO Diviner brightness temperatures as compiled in Durga Prasad et al. 2025, Commun. Earth Environ., Supplementary Data 1, doi:10.1038/s43247-025-02114-6. Verified orbital: the paper states absolute temperatures were 'derived from Diviner brightness temperatures provided in Supplementary Data 1'.",
+   "licence": "CC BY-NC-ND 4.0 - shown unmodified, non-commercial, with attribution."}
+ ]
+}
