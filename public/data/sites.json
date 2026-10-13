@@ -1,0 +1,128 @@
+{
+ "generated": "2026-10-13T09:39:08Z",
+ "start": "2026-01-01T00:00:00Z",
+ "end": "2029-01-01T00:00:00Z",
+ "step_hours": 1,
+ "sites": [
+  {
+   "id": "shackleton",
+   "name": "Shackleton (centre)",
+   "lat": -89.67,
+   "lon": 129.78,
+   "kind": "gazetteer",
+   "note": "USGS Gazetteer centre coordinate of Shackleton (diameter 20.92 km).",
+   "elevation_m": -2789.0,
+   "dem": "LDEM_85S_40M + LDEM_75S_240M"
+  },
+  {
+   "id": "de-gerlache",
+   "name": "de Gerlache (centre)",
+   "lat": -88.48,
+   "lon": -88.34,
+   "kind": "gazetteer",
+   "note": "USGS Gazetteer centre coordinate of de Gerlache (diameter 32.71 km).",
+   "elevation_m": -1217.0,
+   "dem": "LDEM_85S_40M + LDEM_75S_240M"
+  },
+  {
+   "id": "haworth",
+   "name": "Haworth (centre)",
+   "lat": -87.45,
+   "lon": -5.17,
+   "kind": "gazetteer",
+   "note": "USGS Gazetteer centre coordinate of Haworth (diameter 51.42 km).",
+   "elevation_m": -3314.0,
+   "dem": "LDEM_85S_40M + LDEM_75S_240M"
+  },
+  {
+   "id": "faustini",
+   "name": "Faustini (centre)",
+   "lat": -87.18,
+   "lon": 84.31,
+   "kind": "gazetteer",
+   "note": "USGS Gazetteer centre coordinate of Faustini (diameter 42.48 km).",
+   "elevation_m": -2751.5,
+   "dem": "LDEM_85S_40M + LDEM_75S_240M"
+  },
+  {
+   "id": "nobile",
+   "name": "Nobile (centre)",
+   "lat": -85.28,
+   "lon": 53.27,
+   "kind": "gazetteer",
+   "note": "USGS Gazetteer centre coordinate of Nobile (diameter 79.27 km).",
+   "elevation_m": 923.0,
+   "dem": "LDEM_85S_40M + LDEM_75S_240M"
+  },
+  {
+   "id": "mons-malapert",
+   "name": "Mons Malapert (gazetteer centre)",
+   "lat": -85.98,
+   "lon": -1.67,
+   "kind": "gazetteer",
+   "note": "USGS Gazetteer centre coordinate of Mons Malapert (diameter 67.0 km).",
+   "elevation_m": 4920.0,
+   "dem": "LDEM_85S_40M + LDEM_75S_240M"
+  },
+  {
+   "id": "mons-mouton",
+   "name": "Mons Mouton (gazetteer centre)",
+   "lat": -84.6,
+   "lon": 31.0,
+   "kind": "gazetteer",
+   "note": "USGS Gazetteer centre coordinate of Mons Mouton (diameter 130.0 km).",
+   "elevation_m": 4999.0,
+   "dem": "LDEM_75S_240M"
+  },
+  {
+   "id": "shoemaker",
+   "name": "Shoemaker (centre)",
+   "lat": -88.14,
+   "lon": 45.91,
+   "kind": "gazetteer",
+   "note": "USGS Gazetteer centre coordinate of Shoemaker (diameter 51.82 km).",
+   "elevation_m": -3933.5,
+   "dem": "LDEM_85S_40M + LDEM_75S_240M"
+  },
+  {
+   "id": "shackleton-rim-high",
+   "name": "Shackleton rim high point",
+   "lat": -89.7793,
+   "lon": -156.5765,
+   "kind": "derived",
+   "note": "Highest LOLA DEM pixel 8.4-14.6 km from the gazetteer centre of Shackleton; an illustrative candidate, not an official landing site.",
+   "elevation_m": 1737.0,
+   "dem": "LDEM_85S_40M + LDEM_75S_240M"
+  },
+  {
+   "id": "de-gerlache-rim-high",
+   "name": "de Gerlache rim high point",
+   "lat": -88.6662,
+   "lon": -68.4458,
+   "kind": "derived",
+   "note": "Highest LOLA DEM pixel 13.1-22.9 km from the gazetteer centre of de Gerlache; an illustrative candidate, not an official landing site.",
+   "elevation_m": 1815.0,
+   "dem": "LDEM_85S_40M + LDEM_75S_240M"
+  },
+  {
+   "id": "malapert-summit",
+   "name": "Mons Malapert summit (DEM max)",
+   "lat": -85.9895,
+   "lon": 2.0821,
+   "kind": "derived",
+   "note": "Highest LOLA DEM pixel 0.0-16.8 km from the gazetteer centre of Mons Malapert; an illustrative candidate, not an official landing site.",
+   "elevation_m": 5173.5,
+   "dem": "LDEM_85S_40M + LDEM_75S_240M"
+  },
+  {
+   "id": "mouton-summit",
+   "name": "Mons Mouton summit (DEM max)",
+   "lat": -84.8215,
+   "lon": 37.4912,
+   "kind": "derived",
+   "note": "Highest LOLA DEM pixel 0.0-19.5 km from the gazetteer centre of Mons Mouton; an illustrative candidate, not an official landing site.",
+   "elevation_m": 6674.0,
+   "dem": "LDEM_75S_240M"
+  }
+ ]
+}

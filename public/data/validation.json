@@ -1,0 +1,112 @@
+[
+ {
+  "site": "shackleton-rim-high",
+  "utc": "2026-01-01 00:00",
+  "body": "Sun",
+  "horizons_az": 189.095211991,
+  "horizons_el": 1.127821251,
+  "ours_az": 189.1,
+  "ours_el": 1.13,
+  "d_az": 0.005,
+  "d_el": 0.002
+ },
+ {
+  "site": "shackleton-rim-high",
+  "utc": "2026-01-01 00:00",
+  "body": "Earth",
+  "horizons_az": 155.308131197,
+  "horizons_el": 6.081470955,
+  "ours_az": 155.31,
+  "ours_el": 6.08,
+  "d_az": 0.002,
+  "d_el": -0.001
+ },
+ {
+  "site": "shackleton-rim-high",
+  "utc": "2026-07-28 08:00",
+  "body": "Sun",
+  "horizons_az": 168.772742773,
+  "horizons_el": -0.932579329,
+  "ours_az": 168.77,
+  "ours_el": -0.93,
+  "d_az": -0.003,
+  "d_el": 0.003
+ },
+ {
+  "site": "shackleton-rim-high",
+  "utc": "2026-07-28 08:00",
+  "body": "Earth",
+  "horizons_az": 154.642927549,
+  "horizons_el": -4.756451016,
+  "ours_az": 154.64,
+  "ours_el": -4.76,
+  "d_az": -0.003,
+  "d_el": -0.004
+ },
+ {
+  "site": "shackleton-rim-high",
+  "utc": "2027-05-30 09:00",
+  "body": "Sun",
+  "horizons_az": 39.86198232,
+  "horizons_el": -1.24745067,
+  "ours_az": 39.86,
+  "ours_el": -1.25,
+  "d_az": -0.002,
+  "d_el": -0.003
+ },
+ {
+  "site": "shackleton-rim-high",
+  "utc": "2027-05-30 09:00",
+  "body": "Earth",
+  "horizons_az": 150.022495109,
+  "horizons_el": 4.234775236,
+  "ours_az": 150.02,
+  "ours_el": 4.23,
+  "d_az": -0.002,
+  "d_el": -0.005
+ },
+ {
+  "site": "mons-malapert",
+  "utc": "2026-02-02 09:00",
+  "body": "Sun",
+  "horizons_az": 0.639031862,
+  "horizons_el": 4.693093007,
+  "ours_az": 0.64,
+  "ours_el": 4.69,
+  "d_az": 0.001,
+  "d_el": -0.003
+ },
+ {
+  "site": "mons-malapert",
+  "utc": "2026-02-02 09:00",
+  "body": "Earth",
+  "horizons_az": 6.590360232,
+  "horizons_el": 6.013296275,
+  "ours_az": 6.59,
+  "ours_el": 6.01,
+  "d_az": -0.0,
+  "d_el": -0.003
+ },
+ {
+  "site": "mons-malapert",
+  "utc": "2028-04-13 08:00",
+  "body": "Sun",
+  "horizons_az": 317.374305924,
+  "horizons_el": 1.413186883,
+  "ours_az": 317.37,
+  "ours_el": 1.41,
+  "d_az": -0.004,
+  "d_el": -0.003
+ },
+ {
+  "site": "mons-malapert",
+  "utc": "2028-04-13 08:00",
+  "body": "Earth",
+  "horizons_az": 8.39137449,
+  "horizons_el": -0.750137778,
+  "ours_az": 8.39,
+  "ours_el": -0.75,
+  "d_az": -0.001,
+  "d_el": 0.0
+ }
+]
