@@ -1,11 +1,82 @@
 {
  "about": "Optional site layers. Add an entry + GeoJSON point file here to add a layer; the app reads it at start-up. Source of the ISRO layers: /isro worker output (see docs/isro-layers.md).",
  "layers": [
-  {"id": "ch3_sites", "title": "Chandrayaan-3: Shiv Shakti point & in-situ results", "file": "ch3_sites.geojson",
-   "attribution": "Chandrayaan-3 data: ISRO / PRL / SPL-VSSC / LEOS. ChaSTE: Durga Prasad et al. 2025, Commun. Earth Environ., doi:10.1038/s43247-025-02114-6 (CC BY-NC-ND 4.0). APXS: Vadawale et al. 2024, Nature, doi:10.1038/s41586-024-07870-7 (cited values). LIBS & site coordinates: ISRO releases. RAMBHA-LP: MNRAS 542(4):2647 (2025).",
-   "licence": "Factual values with attribution; ISRO web content has no stated open licence."},
-  {"id": "ch3_surface_temps_near_site", "title": "LRO Diviner (orbital) temperatures within ~350 m of ChaSTE", "file": "ch3_surface_temps_near_site.geojson",
+  {
+   "id": "ch3_sites",
+   "title": "Chandrayaan-3: Shiv Shakti point & in-situ results",
+   "file": "ch3_sites.geojson",
+   "attribution": "Chandrayaan-3 data: ISRO / PRL / SPL-VSSC / LEOS. ChaSTE: Durga Prasad et al. 2025, Commun. Earth Environ., doi:10.1038/s43247-025-02114-6 (CC BY-NC-ND 4.0). APXS: Vadawale et al. 2024, Nature, doi:10.1038/s41586-024-07870-7 (cited values). LIBS & site coordinates: ISRO releases. RAMBHA-LP: MNRAS 542(4):2647 (2025). Chandrayaan-3 data: ISRO, archived at ISSDC (PRADAN).",
+   "licence": "Factual values with attribution; ISRO web content has no stated open licence. ISSDC PRADAN terms: non-profit scientific use only; raw data are not copied or redistributed; derived data must not be sold. Only downsampled derived products are shipped here."
+  },
+  {
+   "id": "ch3_surface_temps_near_site",
+   "title": "LRO Diviner (orbital) temperatures within ~350 m of ChaSTE",
+   "file": "ch3_surface_temps_near_site.geojson",
    "attribution": "LRO Diviner brightness temperatures as compiled in Durga Prasad et al. 2025, Commun. Earth Environ., Supplementary Data 1, doi:10.1038/s43247-025-02114-6. Verified orbital: the paper states absolute temperatures were 'derived from Diviner brightness temperatures provided in Supplementary Data 1'.",
-   "licence": "CC BY-NC-ND 4.0 - shown unmodified, non-commercial, with attribution."}
+   "licence": "CC BY-NC-ND 4.0 - shown unmodified, non-commercial, with attribution."
+  },
+  {
+   "id": "tmc2_hillshade",
+   "title": "Chandrayaan-2 TMC-2 DTM hillshade (100 m, derived)",
+   "file": "tmc2_dtm_hillshade_100m.png",
+   "kind": "image",
+   "bounds_ps_m": [
+    69845.49,
+    28834.77,
+    927405.49,
+    125934.77
+   ],
+   "caption": "From TMC-2 DTM ch2_tmc_ndn_20211115T1549013919 (10 m), block-averaged to 100 m, hillshade az 315\u00b0/alt 30\u00b0. Strip spans 87.5\u00b0S\u201359.9\u00b0S; it does NOT cover Shiv Shakti, so a horizon there still relies on LOLA (LDEM_60S_240M here; LDEM_64S/SLDEM2015 would be finer).",
+   "attribution": "We acknowledge the use of data from the Chandrayaan-II, second lunar mission of the Indian Space Research Organisation (ISRO), archived at the Indian Space Science Data Centre (ISSDC).",
+   "licence": "ISSDC PRADAN terms: non-profit scientific use only; raw data are not copied or redistributed; derived data must not be sold. Only downsampled derived products are shipped here."
+  },
+  {
+   "id": "dfsar_xpol",
+   "title": "Chandrayaan-2 DFSAR L-band cross-pol ratio (100 m, derived; NOT CPR)",
+   "file": "dfsar_L_xpol_ratio_100m.png",
+   "kind": "image",
+   "bounds_ps_m": [
+    26423.24,
+    107562.12,
+    168473.24,
+    187937.12
+   ],
+   "caption": "Cross-pol ratio 10\u00b7log10(2\u27e8|HV|,|VH|\u27e9/(HH+VV)) from ch2_sar_ncxl_20260308t062017233 (L-band full-pol, ~84.2\u00b0S 33.4\u00b0E). This is NOT the circular polarisation ratio (CPR needs complex SLI phase) and is not an ice detection. \u03c30 calibration constant (K = 70.31 dB, assumed DN\u00b2/10^(K/10)) is UNVERIFIED. Median \u22127.9 dB (p5\u2013p95 \u221213.2 to \u22125.2 dB).",
+   "attribution": "We acknowledge the use of data from the Chandrayaan-II, second lunar mission of the Indian Space Research Organisation (ISRO), archived at the Indian Space Science Data Centre (ISSDC).",
+   "licence": "ISSDC PRADAN terms: non-profit scientific use only; raw data are not copied or redistributed; derived data must not be sold. Only downsampled derived products are shipped here."
+  },
+  {
+   "id": "dfsar_hh",
+   "title": "Chandrayaan-2 DFSAR L-band HH \u03c30 (100 m, derived)",
+   "file": "dfsar_L_sigma0_HH_100m.png",
+   "kind": "image",
+   "bounds_ps_m": [
+    26423.24,
+    107562.12,
+    168473.24,
+    187937.12
+   ],
+   "caption": "HH backscatter \u03c30; calibration constant UNVERIFIED (relative values only). Median \u221220.0 dB (p5\u2013p95 \u221224.3 to \u221211.2 dB).",
+   "attribution": "We acknowledge the use of data from the Chandrayaan-II, second lunar mission of the Indian Space Research Organisation (ISRO), archived at the Indian Space Science Data Centre (ISSDC).",
+   "licence": "ISSDC PRADAN terms: non-profit scientific use only; raw data are not copied or redistributed; derived data must not be sold. Only downsampled derived products are shipped here."
+  },
+  {
+   "id": "ohrc_shiv_shakti",
+   "title": "Chandrayaan-2 OHRC preview around Shiv Shakti (2 m, PRE-LANDING)",
+   "file": "ohrc_shiv_shakti_2m.png",
+   "kind": "image",
+   "caption": "OHRC image ch2_ohr_ncp_20230506T0548584558, acquired 2023-05-06, BEFORE the August 2023 landing: the lander is not visible and no lander pin is drawn. ~2.6 \u00d7 2.7 km, north up, centred on the published landing coordinates; absolute position may be off by kilometres (SPICE-limited georeferencing, arXiv:2602.14993).",
+   "attribution": "We acknowledge the use of data from the Chandrayaan-II, second lunar mission of the Indian Space Research Organisation (ISRO), archived at the Indian Space Science Data Centre (ISSDC).",
+   "licence": "ISSDC PRADAN terms: non-profit scientific use only; raw data are not copied or redistributed; derived data must not be sold. Only downsampled derived products are shipped here."
+  },
+  {
+   "id": "ch3_chaste_timeseries",
+   "title": "Chandrayaan-3 ChaSTE temperatures (archive, 30-min means)",
+   "file": "ch3_chaste_timeseries_30min.json",
+   "kind": "timeseries",
+   "caption": "Archive-calibrated values, NOT corrected for the probe-induced perturbations applied in Durga Prasad et al. 2025 (archive max \u2248353 K vs the paper's 355 K). S2 is plotted as the near-surface sensor (as in the paper), not S1. The early span includes commissioning data.",
+   "attribution": "Chandrayaan-3 data: ISRO, archived at ISSDC (PRADAN).",
+   "licence": "ISSDC PRADAN terms: non-profit scientific use only; raw data are not copied or redistributed; derived data must not be sold. Only downsampled derived products are shipped here."
+  }
  ]
 }

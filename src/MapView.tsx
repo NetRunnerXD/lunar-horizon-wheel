@@ -12,6 +12,8 @@ export function MapView({ products, index, selected, layers, onPick, onToggle }:
   const cv = useRef<HTMLCanvasElement>(null)
   const [overlay, setOverlay] = useState<Overlay>('sun')
   const [psr, setPsr] = useState(true)
+  const [isroOn, setIsroOn] = useState<Record<string, boolean>>({})
+  const geoLayers = layers.filter(l => l.image && l.bounds_ps_m)
   const [opacity, setOpacity] = useState(0.75)
   const [cross, setCross] = useState<{ x: number; y: number }>({ x: 0, y: 0 })
   const [imgs, setImgs] = useState<Record<string, HTMLImageElement>>({})
@@ -20,6 +22,7 @@ export function MapView({ products, index, selected, layers, onPick, onToggle }:
       const im = new Image(); im.onload = () => setImgs(o => ({ ...o, [k]: im })); im.src = `${BASE}data/${k}.png`
     }
   }, [])
+  useEffect(() => { for (const l of layers) if (l.image && l.bounds_ps_m) { const im = new Image(); im.onload = () => setImgs(o => ({ ...o, [l.id]: im })); im.src = l.image } }, [layers])
   const toPx = (x: number, y: number) => [(x / half + 1) / 2 * N, (1 - y / half) / 2 * N]
   useEffect(() => {
     const c = cv.current?.getContext('2d'); if (!c) return
@@ -27,6 +30,11 @@ export function MapView({ products, index, selected, layers, onPick, onToggle }:
     if (imgs.hillshade) c.drawImage(imgs.hillshade, 0, 0, N, N)
     const ov = overlay === 'sun' ? imgs.pgda_sun : overlay === 'earth' ? imgs.pgda_earth : null
     if (ov) { c.globalAlpha = opacity; c.drawImage(ov, 0, 0, N, N); c.globalAlpha = 1 }
+    for (const l of geoLayers) if (isroOn[l.id] && imgs[l.id]) {
+      const [x0, y0, x1, y1] = l.bounds_ps_m!, [px0, py1] = toPx(x0, y1), [px1, py0] = toPx(x1, y0)
+      c.globalAlpha = 0.85; c.drawImage(imgs[l.id], px0, py1, px1 - px0, py0 - py1); c.globalAlpha = 1
+      c.strokeStyle = '#ff9933'; c.strokeRect(px0, py1, px1 - px0, py0 - py1)
+    }
     if (psr && imgs.psr) c.drawImage(imgs.psr, 0, 0, N, N)
     // graticule
     c.strokeStyle = 'rgba(255,255,255,.25)'; c.lineWidth = 1; c.setLineDash([3, 4])
@@ -46,7 +54,7 @@ export function MapView({ products, index, selected, layers, onPick, onToggle }:
     }
     const [cx, cy] = toPx(cross.x, cross.y)
     c.strokeStyle = '#9be15d'; c.lineWidth = 2; c.beginPath(); c.moveTo(cx - 10, cy); c.lineTo(cx + 10, cy); c.moveTo(cx, cy - 10); c.lineTo(cx, cy + 10); c.stroke(); c.lineWidth = 1
-  }, [imgs, overlay, psr, opacity, index, selected, cross, half])
+  }, [imgs, overlay, psr, opacity, index, selected, cross, half, isroOn, geoLayers])
 
   const ll = latLonFromXY(cross.x, cross.y)
   const offMap = [...index.filter(s => { const p = xyFromLatLon(s.lat, s.lon); return Math.abs(p.x) > half || Math.abs(p.y) > half }).map(s => `${s.name} (${s.lat.toFixed(2)}°, ${s.lon.toFixed(2)}°)`),
@@ -76,6 +84,8 @@ export function MapView({ products, index, selected, layers, onPick, onToggle }:
             <label key={k} className="row"><input type="radio" name="ov" checked={overlay === k} onChange={() => setOverlay(k)} /> {l}</label>)}
           <label className="row">Opacity <input type="range" min={0} max={1} step={0.05} value={opacity} onChange={e => setOpacity(+e.target.value)} aria-label="Overlay opacity" /></label>
           <label className="row"><input type="checkbox" checked={psr} onChange={e => setPsr(e.target.checked)} /> Permanently shadowed regions (LOLA LPSR)</label>
+          {geoLayers.map(l => <label key={l.id} className="row"><input type="checkbox" checked={!!isroOn[l.id]} onChange={e => setIsroOn(o => ({ ...o, [l.id]: e.target.checked }))} /> {l.title} <em className="tag isro">ISRO</em></label>)}
+          {geoLayers.length > 0 && <p className="small">ISRO footprints are outlined in orange and may extend beyond this map. Captions and caveats are in the cards below.</p>}
           <div className={'ramp ' + overlay} aria-hidden /><div className="ramp-l"><span>0%</span><span>time visible</span><span>100%</span></div>
         </fieldset>
         <fieldset><legend>Custom site</legend>

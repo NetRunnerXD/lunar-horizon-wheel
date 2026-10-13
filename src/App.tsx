@@ -211,10 +211,28 @@ function LayerCard({ l }: { l: IsroLayer }) {
     <article className="card layer">
       <h4>{l.title}</h4>
       {l.image && <figure><img src={l.image} alt={l.title} className="figure dark" />{l.caption && <figcaption className="small">{l.caption}</figcaption>}</figure>}
-      {l.image ? null : isTemps ? <p>{l.features.length} points within ~350 m of ChaSTE; absolute temperature {Math.min(...temps).toFixed(0)}–{Math.max(...temps).toFixed(0)} K (local times as given in source).</p> : (
+      {l.series && <ChasteChart s={l.series} />}
+      {l.caption && !l.image && <p className="small warn">{l.caption}</p>}
+      {l.image || l.series ? null : isTemps ? <p>{l.features.length} points within ~350 m of ChaSTE; absolute temperature {Math.min(...temps).toFixed(0)}–{Math.max(...temps).toFixed(0)} K (local times as given in source).</p> : (
         <dl className="kv">{['name', 'landed_utc', 'chaste_peak_surface_T_K', 'chaste_flat_surface_T_K', 'diviner_predicted_T_K', 'apxs_n_obs'].filter(k => f0[k] != null).map(k => <div key={k}><dt>{k.replace(/_/g, ' ')}</dt><dd>{String(f0[k])}</dd></div>)}
           {f0.apxs_mean_wt_pct != null && <div><dt>APXS mean wt%</dt><dd>{Object.entries(f0.apxs_mean_wt_pct as Record<string, number>).map(([k, v]) => `${k} ${v.toFixed(2)}`).join(', ')}</dd></div>}</dl>)}
       <p className="small">{l.attribution} — {l.licence}</p>
     </article>
   )
+}
+
+function ChasteChart({ s }: { s: { utc: string[]; values: number[][]; sensors: string[] } }) {
+  const k = s.sensors.indexOf('S2'), W = 600, H = 180, P = 34
+  const t = s.utc.map(u => Date.parse(u.replace('Z', ':00Z'))), v = s.values.map(r => r[k])
+  const t0 = Math.min(...t), t1 = Math.max(...t), lo = Math.floor(Math.min(...v) / 10) * 10, hi = Math.ceil(Math.max(...v) / 10) * 10
+  const X = (x: number) => P + (x - t0) / (t1 - t0) * (W - P - 8), Y = (y: number) => H - 20 - (y - lo) / (hi - lo) * (H - 30)
+  const peak = Math.max(...v)
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label={`ChaSTE S2 near-surface temperature, archive values, peak ${peak.toFixed(1)} K`} className="chaste">
+      <rect x={P} y={10} width={W - P - 8} height={H - 30} fill="#0f131c" />
+      {[lo, (lo + hi) / 2, hi].map(y => <g key={y}><line x1={P} x2={W - 8} y1={Y(y)} y2={Y(y)} stroke="#26304a" /><text x={P - 4} y={Y(y) + 4} fill="#a3abbf" fontSize="10" textAnchor="end">{y.toFixed(0)} K</text></g>)}
+      <path d={'M' + t.map((x, i) => `${X(x).toFixed(1)},${Y(v[i]).toFixed(1)}`).join('L')} fill="none" stroke="#ff9933" strokeWidth="1.5" />
+      <text x={P} y={H - 4} fill="#a3abbf" fontSize="10">{new Date(t0).toISOString().slice(0, 10)}</text>
+      <text x={W - 8} y={H - 4} fill="#a3abbf" fontSize="10" textAnchor="end">{new Date(t1).toISOString().slice(0, 10)} UTC · S2 (near-surface), peak {peak.toFixed(1)} K (archive)</text>
+    </svg>)
 }

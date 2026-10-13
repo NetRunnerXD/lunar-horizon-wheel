@@ -19,14 +19,15 @@ export async function loadGrid(p: Products): Promise<Grid> { return { ...p.grid,
 export async function loadTerrain() { return new Int16Array(await bin('terrain.bin')) }
 export const loadJson = json
 
-export interface IsroLayer { id: string; title: string; attribution: string; licence: string; features: GeoJSON[]; image?: string; caption?: string }
+export interface IsroLayer { id: string; title: string; attribution: string; licence: string; features: GeoJSON[]; image?: string; caption?: string; kind?: string; bounds_ps_m?: number[]; series?: { utc: string[]; values: number[][]; sensors: string[] } }
 export interface GeoJSON { type: 'Feature'; geometry: { type: 'Point'; coordinates: [number, number] }; properties: Record<string, unknown> }
 /** Optional third-party layers (data/layers/manifest.json). Missing manifest => no layers. */
 export async function loadLayers(): Promise<IsroLayer[]> {
   try {
-    const m = await json<{ layers: { id: string; title: string; file: string; kind?: 'points' | 'image'; attribution: string; licence: string; caption?: string }[] }>('data/layers/manifest.json')
+    const m = await json<{ layers: { id: string; title: string; file: string; kind?: string; attribution: string; licence: string; caption?: string; bounds_ps_m?: number[] }[] }>('data/layers/manifest.json')
     return await Promise.all(m.layers.map(async l => l.kind === 'image' || /\.(png|jpe?g|webp)$/i.test(l.file)
       ? { ...l, features: [], image: BASE + 'data/layers/' + l.file }
+      : l.kind === 'timeseries' ? { ...l, features: [], series: await json<{ utc: string[]; values: number[][]; sensors: string[] }>('data/layers/' + l.file) }
       : { ...l, features: (await json<{ features: GeoJSON[] }>('data/layers/' + l.file)).features }))
   } catch { return [] }
 }

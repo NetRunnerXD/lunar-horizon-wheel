@@ -42,7 +42,8 @@ Gazetteer centres of Shackleton, de Gerlache, Haworth, Faustini, Nobile, Shoemak
 | CLPS catalog | NASA CLPS page, provider pages, NASA statements (Sep 2026) |
 | Chandrayaan-3 values | ISRO releases; Durga Prasad et al. 2025 (CC BY-NC-ND 4.0); Vadawale et al. 2024 (cited values); MNRAS 542:2647. LRO Diviner temperatures via Durga Prasad et al. Suppl. Data 1 |
 
-Chandrayaan-2 OHRC/TMC-2/DFSAR and Chandrayaan-3 instrument L1/L2 data need an ISSDC PRADAN login, so they are not included (see `docs/isro-layers.md`).
+Chandrayaan PRADAN derived layers are included with caveats:
+- **Chandrayaan-2 / Chandrayaan-3 PRADAN derived layers** (downsampled derived products only; raw data not redistributed; ISSDC terms: non-profit scientific use, derived data not sold; acknowledgement to ISRO/ISSDC): TMC-2 DTM hillshade (100 m; does **not** cover Shiv Shakti, so the horizon there still uses LOLA LDEM_60S_240M — LDEM_64S/SLDEM2015 would be finer); OHRC 2 m preview around Shiv Shakti (acquired 2023-05-06, **before the landing**, absolute position may be off by km, no lander pin); DFSAR L-band HH σ0 and cross-pol ratio (100 m; **not CPR**, calibration constant unverified); ChaSTE 30-min archive time series (uncorrected archive values, S2 used as near-surface, includes commissioning data). See `docs/isro-layers.md`.
 
 ## Methods
 See **[METHODS.md](METHODS.md)** (paper-style write-up with references) and the in-app *Methods & validation* tab.

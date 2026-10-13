@@ -52,7 +52,7 @@ export function Methods({ index, layers }: { index: SiteMeta[]; layers: IsroLaye
         <li>Horizons are binned at 0.5° (sites) or 2° (custom grid, 5 km spacing); small near-field features under the DEM resolution are missed.</li>
         <li>Link budget and power sizing use labelled representative assumptions and are not flight-design tools.</li>
         <li>"Derived" sites are DEM-maximum pixels near named features, not official landing sites. The Shiv Shakti point uses only the 240 m DEM.</li>
-        <li>Chandrayaan-2 OHRC/TMC-2/DFSAR rasters are not included (ISSDC PRADAN login required).</li>
+        <li>ISRO PRADAN layers are downsampled derived previews: OHRC predates the landing and may be offset by km; DFSAR is HH σ0 + cross-pol ratio (not CPR, unverified calibration); ChaSTE archive values are uncorrected (S2 near-surface, includes commissioning); TMC-2 does not cover Shiv Shakti.</li>
       </ul>
       <h3>7. AI-use disclosure</h3>
       <p>This project was designed and coded with substantial help from AI assistants (code generation, documentation drafting, data-source research), directed and reviewed by the team. All numbers come from the real datasets above via the reproducible pipeline; nothing is AI-generated data.</p>

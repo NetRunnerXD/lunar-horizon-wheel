@@ -33,3 +33,17 @@ ISSDC terms require acknowledging "ISRO/ISSDC" and generally ask users not to re
 - No OHRC, TMC-2 or DFSAR rasters (PNG/COG), because they all need a login.
 - No rover traverse or per-stop APXS positions: these are not in the open supplementary data.
 - Licences: ISRO web content has no stated open licence (values used factually with attribution). The APXS Nature paper is subscription, so the raw xlsx in `raw/` must not be published, only cited values. ChaSTE data are CC BY-NC-ND.
+
+## Update 2026-10-13: derived PRADAN layers (`layers/pradan/`, about 11 MB)
+Raw downloads stay in `raw/pradan/` and are ignored via `.gitignore`. Build with `.venv/bin/python scripts/build_pradan.py && .venv/bin/python scripts/build_ch3.py`. Each layer in `manifest.json` carries the ISRO/ISSDC acknowledgement and a terms note: non-profit scientific use only, no raw redistribution, no selling of derived data.
+
+| File | Size | Notes |
+|---|---|---|
+| tmc2_dtm_hillshade_100m.png / tmc2_dtm_slope_100m.png / .tif (COG) | 1.7 / 2.4 / 4.7 MB | TMC-2 DTM, 10 m data averaged to 100 m, in app polar stereo. Strip from 87.5°S to 59.9°S, median slope 6.7°, p99 25.9°. |
+| ohrc_shiv_shakti_2m.png | 1.7 MB | ~2.6 × 2.7 km around the site, local azimuthal-equidistant projection. **Image taken 2023-05-06, before the landing.** |
+| dfsar_L_sigma0_HH_100m.png, dfsar_L_xpol_ratio_100m.png/.tif | 87 / 94 / 143 KB | 3.6 km-wide swath near 84.17°S 33.41°E, in app polar stereo. Median σ0 HH −20.0 dB; cross-pol ratio median −7.9 dB (p5–p95 −13.2 to −5.2). |
+| ch3_chaste_timeseries_30min.json | 32 KB | ChaSTE S1–S10, 2023-08-24 to 09-02 UTC; summary and LIBS/APXS inventories attached to the Shiv Shakti feature |
+
+**Horizon at the 69°S site:** the TMC-2 DTM does **not** cover Shiv Shakti. Its polar-stereo y-range (29 to 126 km) is nowhere near the site (338, 534 km). This DTM can't give a horizon there. That needs a DTM covering about 69.4°S 32.3°E out to roughly 100–150 km, such as LOLA LDEM_64S or SLDEM2015, or a TMC-2 DTM ordered for that orbit.
+
+Caveats: DFSAR σ0 calibration assumes DN²/10^(K/10). The ratio is **not** CPR, which needs the complex SLI data (1.2 GB, not processed). ChaSTE values are archive-calibrated without the paper's probe corrections: archive max ~353 K vs the paper's 355 K. The span includes commissioning data. OHRC absolute georeferencing comes from SPICE and can be off by km (arXiv:2602.14993).
