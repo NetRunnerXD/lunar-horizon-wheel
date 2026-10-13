@@ -74,3 +74,4 @@ select,input[type=number]{background:#0f131c;color:var(--ink);border:1px solid #
 .layers{margin-top:14px}.layer h4{margin:0 0 4px}.kv{display:grid;grid-template-columns:1fr;gap:2px;font-size:13px}.kv div{display:flex;gap:8px}.kv dt{color:var(--mut);min-width:170px}.kv dd{margin:0}
 @media(max-width:600px){h1{font-size:20px}.metrics{grid-template-columns:repeat(2,1fr)}.tabs button{padding:8px 8px;font-size:13px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+.figure.dark{background:#000}figure{margin:6px 0}

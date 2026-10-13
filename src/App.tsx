@@ -196,7 +196,7 @@ export default function App() {
         {tab === 'power' && <PowerComms items={items} />}
         {tab === 'missions' && <Missions />}
         {tab === 'methods' && <Methods index={index} layers={layers} />}
-        {layers.length > 0 && tab === 'map' && <section className="layers"><h3>Chandrayaan-3 layers (ISRO)</h3>{layers.map(l => <LayerCard key={l.id} l={l} />)}</section>}
+        {layers.length > 0 && tab === 'map' && <section className="layers"><h3>Chandrayaan-3 layers (ISRO)</h3>{layers.map(l => <LayerCard key={l.id} l={l} />)}<p className="small">ISRO data terms: Chandrayaan data are provided by ISRO/ISSDC for non-commercial research and education with acknowledgement "ISRO/ISSDC"; raw data are not redistributed here (derived previews only).</p></section>}
       </main>
       <footer>Real data: NASA LRO LOLA (PDS), NASA GSFC PGDA illumination maps, NASA JPL NAIF SPICE (DE440){layers.length ? ', ISRO Chandrayaan-3 results (see Methods for attribution)' : ''}. Built with AI assistance (see Methods §7). Not an official NASA or ISRO product. NASA Space Apps 2026.</footer>
     </div>
@@ -210,7 +210,8 @@ function LayerCard({ l }: { l: IsroLayer }) {
   return (
     <article className="card layer">
       <h4>{l.title}</h4>
-      {isTemps ? <p>{l.features.length} points within ~350 m of ChaSTE; absolute temperature {Math.min(...temps).toFixed(0)}–{Math.max(...temps).toFixed(0)} K (local times as given in source).</p> : (
+      {l.image && <figure><img src={l.image} alt={l.title} className="figure dark" />{l.caption && <figcaption className="small">{l.caption}</figcaption>}</figure>}
+      {l.image ? null : isTemps ? <p>{l.features.length} points within ~350 m of ChaSTE; absolute temperature {Math.min(...temps).toFixed(0)}–{Math.max(...temps).toFixed(0)} K (local times as given in source).</p> : (
         <dl className="kv">{['name', 'landed_utc', 'chaste_peak_surface_T_K', 'chaste_flat_surface_T_K', 'diviner_predicted_T_K', 'apxs_n_obs'].filter(k => f0[k] != null).map(k => <div key={k}><dt>{k.replace(/_/g, ' ')}</dt><dd>{String(f0[k])}</dd></div>)}
           {f0.apxs_mean_wt_pct != null && <div><dt>APXS mean wt%</dt><dd>{Object.entries(f0.apxs_mean_wt_pct as Record<string, number>).map(([k, v]) => `${k} ${v.toFixed(2)}`).join(', ')}</dd></div>}</dl>)}
       <p className="small">{l.attribution} — {l.licence}</p>
